@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>TJ &amp; Kyle - Thailand 2026</title>
+<meta property="og:title" content="TJ &amp; Kyle - Thailand 2026">
+<meta property="og:description" content="Where we are right now, what we're up to today, and every flight. Follow along!">
+<meta property="og:image" content="assets/icons/icon-512.png">
+<meta name="description" content="Follow TJ and Kyle through Thailand, live.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" href="assets/icons/icon-192.png">
+<meta name="theme-color" content="#F3EBD9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TJ &amp; Kyle">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Caveat:wght@600;700&amp;family=Figtree:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#2F86B0"></rect><circle cx="50" cy="50" r="20" fill="#F4E9D6"></circle></svg></template>
+<style>
+html,body{-webkit-tap-highlight-color:transparent;margin:0;padding:0;background:#F3EBD9;color:#2E2117;font-family:Figtree,system-ui,sans-serif;-webkit-text-size-adjust:100%;scroll-behavior:smooth;overflow-x:hidden}
+*{box-sizing:border-box}
+a{color:oklch(0.5 0.11 225);text-decoration:none}
+a:hover{color:oklch(0.42 0.11 225);text-decoration:underline}
+nav::-webkit-scrollbar{display:none}
+@keyframes ktpulse{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.6);opacity:0}}
+.leaflet-container{font-family:Figtree,system-ui,sans-serif;background:#9fd3e8}
+.leaflet-tile-pane{filter:saturate(1.35) brightness(1.03)}
+.leaflet-tooltip.kt-bubble{background:#1F2A33;color:#FFFFFF;border:0;border-radius:12px;padding:6px 10px;font:700 13px Figtree,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.2);white-space:nowrap}
+.leaflet-tooltip-top.kt-bubble:before{border-top-color:#2E2117}
+</style>
+</helmet>
+
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:url(&quot;assets/bg/background.jpg&quot;) center/cover no-repeat, #F3EBD9"></div>
+
+<sc-if value="{{ locked }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1">
+  <form onSubmit="{{ unlock }}" style="width:100%;max-width:340px;background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:28px;padding:22px 20px;box-shadow:0 0 0 2px #CDB28A,0 20px 50px rgba(46,33,23,.25);display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:center">
+    <sc-if value="{{ pickRole }}" hint-placeholder-val="{{ true }}">
+      <button type="button" onClick="{{ pickFam }}" style="width:100%;min-height:64px;border:0;border-radius:18px;background:#5C3D24;color:#F7EEDF;font:800 20px 'Bricolage Grotesque',sans-serif;cursor:pointer;box-shadow:0 3px 0 #3B2616">Family</button>
+      <button type="button" onClick="{{ pickUs }}" style="width:100%;min-height:64px;border:0;border-radius:18px;background:#5C3D24;color:#F7EEDF;font:800 20px 'Bricolage Grotesque',sans-serif;cursor:pointer;box-shadow:0 3px 0 #3B2616">Kyle &amp; TJ</button>
+    </sc-if>
+    <sc-if value="{{ hasRole }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#2E2117">{{ roleLabel }}</div>
+      <input type="password" value="{{ pass }}" onInput="{{ onPass }}" placeholder="Password" autocomplete="current-password" aria-label="Password" style="width:100%;height:52px;border-radius:14px;border:2px solid #D9C3A0;background:#FBF3E4;padding:0 16px;font:500 17px Figtree,sans-serif;color:#2E2117;outline:none;text-align:center" style-focus="border-color:#5C3D24">
+      <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#B5452F;font-weight:700">{{ err }}</div></sc-if>
+      <button type="submit" onClick="{{ enterPlain }}" style="width:100%;min-height:52px;border:0;border-radius:18px;background:#5C3D24;color:#F7EEDF;font:800 20px 'Bricolage Grotesque',sans-serif;cursor:pointer;box-shadow:0 3px 0 #3B2616">Enter</button>
+      <sc-if value="{{ isUsRole }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding-top:4px">
+          <div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7A4B26">Or enter and share my location</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button type="submit" onClick="{{ enterKyle }}" style="min-height:48px;border:2px solid #5C3D24;border-radius:14px;background:#FBF3E4;color:#5C3D24;font:800 16px Figtree,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.5s-7-6.3-7-11.8a7 7 0 0 1 14 0c0 5.5-7 11.8-7 11.8z" fill="#B5452F"></path><circle cx="12" cy="9.7" r="2.6" fill="#FBF3E4"></circle></svg>As Kyle</button>
+            <button type="submit" onClick="{{ enterTJ }}" style="min-height:48px;border:2px solid #5C3D24;border-radius:14px;background:#FBF3E4;color:#5C3D24;font:800 16px Figtree,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.5s-7-6.3-7-11.8a7 7 0 0 1 14 0c0 5.5-7 11.8-7 11.8z" fill="#B5452F"></path><circle cx="12" cy="9.7" r="2.6" fill="#FBF3E4"></circle></svg>As TJ</button>
+          </div>
+        </div>
+      </sc-if>
+      <button type="button" onClick="{{ backRole }}" style="min-height:44px;border:0;background:transparent;color:#5C3D24;font:700 15px Figtree,sans-serif;cursor:pointer">Back</button>
+    </sc-if>
+  </form>
+</div>
+</sc-if>
+
+<sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;position:relative;z-index:1">
+
+  <header style="position:sticky;top:0;z-index:1000;padding-top:env(safe-area-inset-top);background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-bottom:2px solid #CDB28A;box-shadow:0 4px 14px rgba(46,33,23,.12)">
+    <div style="max-width:980px;margin:0 auto;padding:14px 16px 4px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="color:#5C3D24;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.01em;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.02"><span style="font-size:clamp(20px,5.6vw,26px);white-space:nowrap">TJ &amp; Kyle</span><span style="font-size:clamp(13px,3.6vw,16px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;color:#7A4B26">Thailand 2026</span></div>
+      <div aria-label="{{ miles.label }}" style="display:flex;align-items:center;gap:6px;flex:none">
+        <div style="display:flex;gap:2px;padding:3px;border-radius:9px;background:#3B2616;box-shadow:inset 0 1px 3px rgba(0,0,0,.5),0 2px 0 #CDB28A">
+          <sc-for list="{{ miles.digits }}" as="md" hint-placeholder-count="5"><span style="width:clamp(11px,3.2vw,17px);height:clamp(18px,5vw,25px);border-radius:4px;background:linear-gradient(#FBF3E4 0 48%, #EADCC4 52% 100%);color:#2E2117;display:flex;align-items:center;justify-content:center;font:800 clamp(12px,3.4vw,17px) 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums">{{ md }}</span></sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;line-height:1.05">
+          <span style="font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#5C3D24">miles</span>
+          <span style="font-size:10px;font-weight:700;color:#7A4B26">so far</span>
+        </div>
+      </div>
+    </div>
+    <nav aria-label="Sections" style="max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:8px 8px 8px">
+      <a href="#now" onClick="{{ nav.now.go }}" aria-label="Now" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.now.bg }};color:{{ nav.now.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5s-7-6.3-7-11.8a7 7 0 0 1 14 0c0 5.5-7 11.8-7 11.8z" fill="#B5452F" stroke="#B5452F"></path><circle cx="12" cy="9.7" r="2.6" fill="#FBF3E4" stroke="none"></circle></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Now</span>
+      </a>
+      <a href="#map" onClick="{{ nav.map.go }}" aria-label="Map" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.map.bg }};color:{{ nav.map.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.2v13.8l6-2.2 6 2.2 6-2.2V4l-6 2.2z"></path><path d="M9 4v13.8M15 6.2V20"></path></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Map</span>
+      </a>
+      <a href="#days" onClick="{{ nav.days.go }}" aria-label="Itinerary" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.days.bg }};color:{{ nav.days.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path><circle cx="8.5" cy="14.5" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="14.5" r="1" fill="currentColor" stroke="none"></circle></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Itinerary</span>
+      </a>
+      <a href="#stays" onClick="{{ nav.stays.go }}" aria-label="Staying" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.stays.bg }};color:{{ nav.stays.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M3 15.5h18"></path><path d="M6.5 10V8a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 12.5 8v2"></path></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Staying</span>
+      </a>
+      <a href="#flights" onClick="{{ nav.flights.go }}" aria-label="Flights" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.flights.bg }};color:{{ nav.flights.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15.5v-1.6l-7.5-4.6V4.6a1.5 1.5 0 0 0-3 0v4.7L3 13.9v1.6l7.5-2.3v4.6l-2 1.5v1.3l3.5-1 3.5 1v-1.3l-2-1.5v-4.6z"></path></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Flights</span>
+      </a>
+      <a href="#contacts" onClick="{{ nav.contacts.go }}" aria-label="Contacts" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.contacts.bg }};color:{{ nav.contacts.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.3"></circle><path d="M3 19.5a6 6 0 0 1 12 0"></path><path d="M15.5 5.3a3.3 3.3 0 0 1 0 6.4M17.5 14.2a6 6 0 0 1 3.5 5.3"></path></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Contacts</span>
+      </a>
+      <a href="#photos" onClick="{{ nav.photos.go }}" aria-label="Photos" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 0;border-radius:14px;text-decoration:none;background:{{ nav.photos.bg }};color:{{ nav.photos.ink }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h3.2l1.8-2.8h6l1.8 2.8H20v11H4z"></path><circle cx="12" cy="13.8" r="3.4"></circle></svg>
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap">Photos</span>
+      </a>
+    </nav>
+  </header>
+    <main style="position:relative;z-index:1;max-width:980px;margin:0 auto;padding:18px 14px 48px;display:flex;flex-direction:column;gap:36px">
+
+    <sc-if value="{{ showInstall }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#F4E9D6;border:1px solid #D9C3A0;box-shadow:0 8px 24px rgba(31,42,51,.12);border-radius:20px;padding:14px 16px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:center;margin-bottom:-28px;margin-top:4px">
+        <img src="assets/icons/icon-192.png" alt="" style="width:52px;height:52px;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.12)">
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+          <div>
+            <div style="font-size:16px;font-weight:700">Put this trip on your home screen</div>
+            <div style="font-size:14px;color:#3E4A54;line-height:1.4;text-wrap:pretty">{{ installText }}</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-if value="{{ canPrompt }}" hint-placeholder-val="{{ false }}"><button onClick="{{ doInstall }}" style="min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">Install app</button></sc-if>
+            <button onClick="{{ hideInstall }}" style="min-height:44px;border:0;border-radius:999px;padding:0 14px;background:transparent;color:#3E4A54;font:600 14px Figtree,sans-serif;cursor:pointer">Not now</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;flex-wrap:wrap;gap:24px 20px;align-items:stretch">
+    <section id="now" data-screen-label="Now" style="scroll-margin-top:140px;flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Right now</h2>
+      <div style="background:{{ sky.bg }};color:{{ sky.ink }};border-radius:26px;padding:18px 16px;box-shadow:0 0 0 2px #CDB28A,0 16px 40px rgba(31,42,51,.10);display:flex;flex-direction:column;gap:16px;transition:background 1.2s ease">
+        <div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between">
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <sc-if value="{{ trk.showEyebrow }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.accent }}">{{ trk.eyebrow }}</span></sc-if>
+              <sc-if value="{{ trk.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 8px;background:{{ trk.badgeBg }};color:#fff">{{ trk.badge }}</span></sc-if>
+            </div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.04;letter-spacing:-.02em;text-wrap:balance">{{ trk.head }}</div>
+            <div style="font-size:16px;line-height:1.45;color:{{ sky.muted }};text-wrap:pretty">{{ trk.sub }}</div>
+          </div>
+          <div style="position:relative;width:clamp(72px,20vw,104px);height:clamp(72px,20vw,104px);flex:none;margin:6px 6px 0 0">{{ nowSticker }}
+            <sc-for list="{{ nowExtras }}" as="nx" hint-placeholder-count="0"><img src="{{ nx.src }}" alt="" style="position:absolute;left:{{ nx.l }};top:{{ nx.t }};width:{{ nx.w }};height:{{ nx.w }};object-fit:contain;transform:rotate({{ nx.r }});filter:drop-shadow(0 3px 4px rgba(0,0,0,.18));pointer-events:none"></sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ trk.showProgress }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:10px;border-radius:999px;background:{{ sky.tile }};overflow:hidden"><div style="height:100%;width:{{ trk.pct }}%;background:oklch(0.62 0.12 225);border-radius:999px"></div></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:700;color:{{ sky.muted }}"><span>{{ trk.fromLabel }}</span><span>{{ trk.pctLabel }}</span><span>{{ trk.toLabel }}</span></div>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+          <sc-for list="{{ clocks }}" as="ck" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;text-align:center">
+              <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:{{ ck.labelInk }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ ck.label }}</div>
+              <svg viewBox="0 0 100 100" aria-hidden="true" style="width:100%;max-width:112px;display:block;filter:drop-shadow(0 3px 4px rgba(46,33,23,.22))">
+                <circle cx="50" cy="50" r="49" fill="{{ ck.rim }}"></circle>
+                <circle cx="50" cy="50" r="44.5" fill="none" stroke="#E2BF6E" stroke-width="2" stroke-dasharray="0.1 4.6" stroke-linecap="round"></circle>
+                <circle cx="50" cy="50" r="40" fill="#FBF3E4"></circle>
+                <circle cx="50" cy="50" r="37" fill="none" stroke="#C9A24A" stroke-width="0.8"></circle>
+                <text x="50" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#7A4B26" font-family="Figtree,sans-serif">๑๒</text>
+                <text x="83" y="53.5" text-anchor="middle" font-size="10" font-weight="700" fill="#7A4B26" font-family="Figtree,sans-serif">๓</text>
+                <text x="50" y="86" text-anchor="middle" font-size="10" font-weight="700" fill="#7A4B26" font-family="Figtree,sans-serif">๖</text>
+                <text x="17" y="53.5" text-anchor="middle" font-size="10" font-weight="700" fill="#7A4B26" font-family="Figtree,sans-serif">๙</text>
+                <circle cx="65.5" cy="23.2" r="1.6" fill="#C9A24A"></circle><circle cx="76.8" cy="34.5" r="1.6" fill="#C9A24A"></circle><circle cx="76.8" cy="65.5" r="1.6" fill="#C9A24A"></circle><circle cx="65.5" cy="76.8" r="1.6" fill="#C9A24A"></circle><circle cx="34.5" cy="76.8" r="1.6" fill="#C9A24A"></circle><circle cx="23.2" cy="65.5" r="1.6" fill="#C9A24A"></circle><circle cx="23.2" cy="34.5" r="1.6" fill="#C9A24A"></circle><circle cx="34.5" cy="23.2" r="1.6" fill="#C9A24A"></circle>
+                <line x1="50" y1="52" x2="50" y2="30" stroke="#3B2616" stroke-width="3.6" stroke-linecap="round" transform="rotate({{ ck.hDeg }} 50 50)"></line>
+                <line x1="50" y1="53" x2="50" y2="19" stroke="#3B2616" stroke-width="2.2" stroke-linecap="round" transform="rotate({{ ck.mDeg }} 50 50)"></line>
+                <circle cx="50" cy="50" r="3.2" fill="#B5452F"></circle>
+              </svg>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(15px,3.6vw,19px);line-height:1.05;white-space:nowrap;color:{{ ck.ink }}">{{ ck.big }}</div>
+              <div style="font-size:12px;font-weight:600;color:{{ ck.sub }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ ck.small }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ false }}">
+          <div style="background:{{ sky.tile }};border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:4px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.muted }}">On the agenda today · {{ today.title }}</div>
+            </div>
+            <sc-for list="{{ today.items }}" as="ai" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:7px 8px;margin:0 -8px;border-radius:12px;background:{{ ai.bg }}">
+                <span style="width:8px;height:8px;border-radius:50%;margin:8px 0 0 7px;background:{{ ai.ring }}"></span>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-size:15px;line-height:1.35;font-weight:{{ ai.weight }};opacity:{{ ai.op }}">{{ ai.text }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+      </div>
+
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#F4E9D6;border-radius:20px;padding:16px 18px;border:1px solid #D9C3A0;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700">
+          <span style="width:8px;height:8px;border-radius:50%;background:{{ shareDot }}"></span>{{ shareTitle }}
+        </div>
+        <div style="font-size:14px;color:#5E6770;line-height:1.45;text-wrap:pretty">{{ shareText }}</div>
+        <sc-if value="{{ notSharing }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button onClick="{{ shareKyle }}" style="min-height:44px;border:0;border-radius:999px;padding:0 16px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">Share as Kyle</button>
+            <button onClick="{{ shareTJ }}" style="min-height:44px;border:0;border-radius:999px;padding:0 16px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">Share as TJ</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sharing }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button onClick="{{ sendNow }}" style="min-height:44px;border:0;border-radius:999px;padding:0 16px;background:oklch(0.58 0.11 225);color:#fff;font:700 14px Figtree,sans-serif;cursor:pointer">Send location now</button>
+            <sc-if value="{{ canWake }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleWake }}" style="min-height:44px;border:1px solid #D9C3A0;border-radius:999px;padding:0 16px;background:#F4E9D6;color:#2E2117;font:700 14px Figtree,sans-serif;cursor:pointer">{{ wakeLabel }}</button></sc-if>
+            <button onClick="{{ stopShare }}" style="min-height:44px;border:1px solid #D9C3A0;border-radius:999px;padding:0 16px;background:#F4E9D6;color:#2E2117;font:700 14px Figtree,sans-serif;cursor:pointer">Stop sharing</button>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+    </section>
+
+    <section id="map" data-screen-label="Map" style="scroll-margin-top:140px;flex:1.25 1 400px;min-width:0;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Map</h2>
+      </div>
+      <div ref="{{ mapRef }}" style="width:100%;flex:1;min-height:340px;border-radius:24px;overflow:hidden;box-shadow:0 2px 0 #D9C3A0,0 16px 40px rgba(31,42,51,.08);background:#bfe3ef;position:relative;z-index:1"></div>
+    </section>
+    </div>
+
+    <section id="days" data-screen-label="Day by day" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Itinerary</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-start;background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:26px;padding:clamp(10px,3vw,16px);box-shadow:0 0 0 2px #CDB28A,0 16px 40px rgba(46,33,23,.12)">
+
+      <div style="order:1;flex:1 1 100%;min-width:0;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;text-align:center">{{ calMonth }}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px">
+          <div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Sun</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Mon</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Tue</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Wed</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Thu</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Fri</div><div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7A4B26;padding-bottom:2px">Sat</div>
+          <sc-for list="{{ cal }}" as="cd" hint-placeholder-count="28">
+            <button onClick="{{ cd.go }}" disabled="{{ cd.empty }}" aria-label="{{ cd.label }}" style="position:relative;min-height:clamp(48px,13vw,82px);border:2px solid {{ cd.ring }};border-radius:12px;background:{{ cd.bg }};color:{{ cd.ink }};cursor:pointer;padding:5px 4px 4px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;overflow:hidden;font:inherit;text-align:left;box-shadow:{{ cd.shadow }}">
+              <span style="font:800 clamp(13px,3.6vw,18px) 'Bricolage Grotesque',sans-serif;line-height:1">{{ cd.num }}</span>
+              <sc-if value="{{ cd.stk }}" hint-placeholder-val="{{ false }}"><img src="{{ cd.stk }}" alt="" style="position:absolute;right:2px;bottom:2px;width:clamp(20px,6vw,40px);height:clamp(20px,6vw,40px);object-fit:contain;opacity:{{ cd.stkOp }}"></sc-if>
+              <span style="font:800 9px Figtree,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:{{ cd.markInk }};position:relative">{{ cd.mark }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ dayShown }}" hint-placeholder-val="{{ false }}"><div ref="{{ dayCardRef }}" onTouchStart="{{ dayTS }}" onTouchEnd="{{ dayTE }}" style="order:2;flex:1 1 100%;min-width:0;position:relative;display:flex;flex-direction:column;gap:12px;background:#FBF3E4;border-radius:20px;padding:clamp(10px,3vw,14px);box-shadow:0 0 0 2px #D9C3A0">
+        <div style="display:flex;justify-content:flex-end;margin:-4px -4px -10px 0"><button onClick="{{ dayClose }}" aria-label="Close day" style="width:36px;height:36px;border-radius:50%;border:0;background:#E6D3B4;color:#5C3D24;font:800 16px Figtree,sans-serif;cursor:pointer">✕</button></div>
+        <div style="display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:8px">
+          <button onClick="{{ dayPrev }}" aria-label="Previous day" style="width:48px;height:48px;border-radius:50%;border:0;background:#5C3D24;color:#FFFFFF;font:800 22px Figtree,sans-serif;cursor:pointer;opacity:{{ dc.prevOp }}">‹</button>
+          <div style="justify-self:center;display:flex;align-items:center;gap:12px;min-width:0">
+            <div style="flex:none;width:62px;border-radius:12px;overflow:hidden;background:#FBF3E4;text-align:center;box-shadow:0 2px 0 #CDB28A,0 4px 10px rgba(46,33,23,.12)">
+              <div style="background:#B5452F;color:#FFFFFF;font:800 11px Figtree,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:3px 0">{{ dc.mon }}</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.05;padding-top:2px">{{ dc.dd }}</div>
+              <div style="font:800 10px Figtree,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#7A4B26;padding-bottom:4px">{{ dc.wd }}</div>
+            </div>
+            <div style="min-width:0">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7A4B26">Day {{ dc.num }} of {{ dc.total }}</div>
+              <div style="font-size:15px;font-weight:700">{{ dc.dateLabel }}</div>
+            </div>
+          </div>
+          <button onClick="{{ dayNext }}" aria-label="Next day" style="width:48px;height:48px;border-radius:50%;border:0;background:#5C3D24;color:#FFFFFF;font:800 22px Figtree,sans-serif;cursor:pointer;opacity:{{ dc.nextOp }}">›</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center">
+        <div ref="{{ dayMapRef }}" style="flex:1.2 1 320px;min-width:0;height:clamp(200px,48vw,300px);border-radius:16px;overflow:hidden;background:#9fd3e8;position:relative;z-index:0"></div>
+        <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-start;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7A4B26">{{ dc.where }}</span>
+          <sc-if value="{{ dc.star }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:800;color:oklch(0.45 0.1 70)">★ Highlight</span></sc-if>
+          <sc-if value="{{ dc.isToday }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:oklch(0.58 0.11 35);color:#fff;border-radius:999px;padding:3px 8px">Today</span></sc-if>
+        </div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,5.6vw,28px);line-height:1.08;letter-spacing:-.02em;text-align:left;text-wrap:balance">{{ dc.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;width:100%">
+          <sc-for list="{{ dc.items }}" as="it" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start;font-size:16px;line-height:1.4">
+              <span style="width:8px;height:8px;border-radius:50%;margin:9px 0 0 6px;background:{{ it.ring }}"></span>
+              <span style="color:{{ it.ink }};font-weight:{{ it.weight }}">{{ it.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+        </div>
+        <sc-if value="{{ dc.done }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:84px;right:22px;z-index:500;transform:rotate(-12deg);border:3px solid oklch(0.5 0.11 150);color:oklch(0.5 0.11 150);border-radius:12px;padding:4px 10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;background:rgba(255,253,248,.92)">✓ {{ dc.stamp }}</div>
+        </sc-if>
+      </div></sc-if>
+      </div>
+    </section>
+
+    <section id="stays" data-screen-label="Hotels" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Where we're staying</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(calc((100% - 24px) / 3), (880px - 100%) * 999, 100%),1fr));gap:12px">
+        <sc-for list="{{ stays }}" as="st" hint-placeholder-count="4">
+          <div style="background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:24px;overflow:hidden;box-shadow:0 0 0 2px #CDB28A,0 12px 30px rgba(46,33,23,.12);display:flex;flex-direction:column;border:3px solid {{ st.border }}">
+            <div style="position:relative">
+              <img src="{{ st.photo }}" alt="{{ st.name }}" loading="lazy" style="width:100%;height:200px;object-fit:cover;display:block">
+              <sc-if value="{{ st.here }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:12px;top:12px;background:oklch(0.58 0.11 35);color:#fff;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 10px">We're here</div></sc-if>
+            </div>
+            <div style="flex:1;padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.48 0.12 35)">{{ st.dates }}</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1.1">{{ st.name }}</div>
+              <div style="font-size:15px;color:#3E4A54;line-height:1.45;text-wrap:pretty">{{ st.blurb }}</div>
+              <div style="display:flex;flex-direction:column;gap:3px;font-size:14px;color:#5E6770;line-height:1.4">
+                <sc-for list="{{ st.facts }}" as="f" hint-placeholder-count="3"><div>{{ f }}</div></sc-for>
+              </div>
+              <sc-if value="{{ st.url }}" hint-placeholder-val="{{ false }}"><a href="{{ st.url }}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:auto;min-height:44px;display:flex;align-items:center;padding:0 18px;border-radius:999px;background:#5C3D24;color:#FFFFFF;font-size:14px;font-weight:700;text-decoration:none">Visit the website ↗</a></sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ showGrammy }}" hint-placeholder-val="{{ false }}"><div style="background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:24px;overflow:hidden;box-shadow:0 0 0 2px #CDB28A,0 12px 30px rgba(46,33,23,.12);display:flex;flex-wrap:wrap;border:3px solid {{ grammy.border }}">
+        <div style="position:relative;flex:1 1 300px;min-height:220px">
+          <img src="{{ grammy.photo }}" alt="Grammy &amp; Tim's house" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
+          <sc-if value="{{ grammy.here }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:12px;top:12px;background:oklch(0.58 0.11 35);color:#fff;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 10px">We're here</div></sc-if>
+        </div>
+        <div style="flex:1 1 300px;padding:18px 20px 20px;display:flex;flex-direction:column;justify-content:center;gap:8px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.48 0.12 35)">{{ grammy.dates }}</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.1">Grammy &amp; Tim's</div>
+          <div style="font-size:15px;color:#3E4A54;line-height:1.45;text-wrap:pretty">{{ grammy.blurb }}</div>
+          <sc-for list="{{ grammy.facts }}" as="f" hint-placeholder-count="1"><div style="font-size:14px;color:#5E6770">{{ f }}</div></sc-for>
+        </div>
+      </div></sc-if>
+      <button onClick="{{ toggleStays }}" style="align-self:center;min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">{{ staysLabel }}</button>
+    </section>
+
+    <section id="flights" data-screen-label="Flights" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Flights</h2>
+        <div style="font-size:14px;font-weight:800;background:#F4E9D6;border-radius:999px;padding:6px 12px">{{ flightsDone }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ flTop }}" as="fl" hint-placeholder-count="2">
+          <a href="{{ fl.fa }}" target="_blank" rel="noopener" style="display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:20px;padding:10px 14px;border:2px solid {{ fl.border }};color:#2E2117;text-decoration:none;box-shadow:0 0 0 2px #CDB28A">
+            <img src="{{ fl.sticker }}" alt="" style="width:64px;height:44px;object-fit:contain;transform:{{ fl.flip }}">
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <sc-if value="{{ fl.tag }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.5 0.12 35)">{{ fl.tag }}</div></sc-if>
+              <div style="font-size:16px;font-weight:800;line-height:1.25">{{ fl.route }}</div>
+              <div style="font-size:13px;color:#5E6770">{{ fl.title }} · {{ fl.when }}</div>
+              <sc-if value="{{ fl.flying }}" hint-placeholder-val="{{ false }}"><div style="height:6px;border-radius:999px;background:#E6D3B4;overflow:hidden;margin-top:4px"><div style="height:100%;width:{{ fl.pct }}%;background:oklch(0.58 0.11 225)"></div></div></sc-if>
+            </div>
+            <span style="font-size:12px;font-weight:800;border-radius:999px;padding:6px 10px;background:{{ fl.statusBg }};color:{{ fl.statusInk }};white-space:nowrap">{{ fl.status }}</span>
+          </a>
+        </sc-for>
+        <sc-if value="{{ hasRest }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleFl }}" style="align-self:center;min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">{{ restLabel }}</button>
+        </sc-if>
+        <sc-if value="{{ showRest }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ flRest }}" as="fr" hint-placeholder-count="3">
+          <a href="{{ fr.fa }}" target="_blank" rel="noopener" style="display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:20px;padding:10px 14px;border:2px solid {{ fr.border }};color:#2E2117;text-decoration:none;box-shadow:0 0 0 2px #CDB28A">
+            <img src="{{ fr.sticker }}" alt="" style="width:64px;height:44px;object-fit:contain;transform:{{ fr.flip }}">
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <sc-if value="{{ fr.tag }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.5 0.12 35)">{{ fr.tag }}</div></sc-if>
+              <div style="font-size:16px;font-weight:800;line-height:1.25">{{ fr.route }}</div>
+              <div style="font-size:13px;color:#5E6770">{{ fr.title }} · {{ fr.when }}</div>
+              <sc-if value="{{ fr.flying }}" hint-placeholder-val="{{ false }}"><div style="height:6px;border-radius:999px;background:#E6D3B4;overflow:hidden;margin-top:4px"><div style="height:100%;width:{{ fr.pct }}%;background:oklch(0.58 0.11 225)"></div></div></sc-if>
+            </div>
+            <span style="font-size:12px;font-weight:800;border-radius:999px;padding:6px 10px;background:{{ fr.statusBg }};color:{{ fr.statusInk }};white-space:nowrap">{{ fr.status }}</span>
+          </a>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+
+    <section id="contacts" data-screen-label="Contacts" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Contacts</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:14px">
+        <sc-for list="{{ families }}" as="fam" hint-placeholder-count="2">
+          <div style="background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:26px;overflow:hidden;box-shadow:0 0 0 2px #CDB28A,0 12px 30px rgba(46,33,23,.12)">
+            <button onClick="{{ fam.toggle }}" aria-expanded="{{ fam.open }}" style="width:100%;border:0;cursor:pointer;text-align:left;font:inherit;display:flex;align-items:center;gap:14px;padding:12px 16px;background:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.4px) 0 0/7px 7px, linear-gradient(160deg, #6A4729, #4E321C);color:#F7EEDF;border-bottom:3px solid #C9A24A">
+              <div style="flex:none;width:62px;height:62px;border-radius:50%;background:#FBF3E4;border:3px solid #C9A24A;box-shadow:0 0 0 3px #B5452F,0 4px 10px rgba(0,0,0,.3);display:flex;align-items:flex-end;justify-content:center;overflow:hidden">
+                <img src="{{ fam.face }}" alt="" style="width:58px;height:58px;object-fit:contain;object-position:bottom">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.01em">{{ fam.title }}</div>
+                <div style="font-size:13px;font-weight:700;color:#E2BF6E">{{ fam.chev }}</div>
+              </div>
+            </button>
+            <sc-if value="{{ fam.open }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;padding:6px 10px 10px">
+              <sc-for list="{{ fam.people }}" as="pp" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px">
+                  <div style="width:40px;height:40px;border-radius:50%;background:{{ pp.avBg }};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px">{{ pp.initial }}</div>
+                  <div style="min-width:0;display:flex;flex-direction:column">
+                    <span style="font-size:17px;font-weight:700;line-height:1.2">{{ pp.name }}</span>
+                    <sc-if value="{{ pp.rel }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#6B7580">{{ pp.rel }}</span></sc-if>
+                  </div>
+                  <a href="{{ pp.tel }}" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:#5C3D24;text-decoration:none;white-space:nowrap;padding:8px 0" style-hover="text-decoration:underline">{{ pp.num }}</a>
+                </div>
+              </sc-for>
+            </div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+        <section id="photos" data-screen-label="Photos" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Photo album</h2>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><button onClick="{{ addPhotos }}" style="min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:800 15px Figtree,sans-serif;cursor:pointer;box-shadow:0 2px 0 rgba(31,42,51,.15)">+ Add photos</button></sc-if>
+      </div>
+      <input type="file" accept="image/*" multiple="multiple" ref="{{ fileRef }}" onChange="{{ onFiles }}" style="display:none">
+      <sc-if value="{{ hasPhotos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,42%),1fr));gap:26px 18px;padding:10px 6px 4px">
+          <sc-for list="{{ photos }}" as="ph" hint-placeholder-count="4">
+            <button onClick="{{ ph.open }}" aria-label="{{ ph.cap }}" style="padding:10px 10px 0;border:0;background:#FFFFFF;color:#2E2117;box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 24px rgba(31,42,51,.16);transform:rotate({{ ph.rot }});cursor:pointer;display:flex;flex-direction:column;text-align:center;font:inherit">
+              <img src="{{ ph.src }}" alt="{{ ph.cap }}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#EDE7DA">
+              <span style="font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.1;padding:8px 2px 2px;min-height:32px;overflow-wrap:anywhere">{{ ph.cap }}</span>
+              <span style="font-size:11px;font-weight:600;color:#6B7580;padding-bottom:10px">{{ ph.meta }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noPhotos }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:14px;font-weight:600;color:#2E2117;background:#F4E9D6;border-radius:999px;padding:4px 12px;width:max-content;max-width:100%">No photos yet. Check back soon!</div>
+      </sc-if>
+    </section>
+  </main>
+
+  <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLb }}" style="position:fixed;inset:0;z-index:2000;background:rgba(18,24,29,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px">
+      <img src="{{ lb.src }}" alt="{{ lb.cap }}" style="max-width:100%;max-height:74vh;border-radius:16px;object-fit:contain;display:block">
+      <div style="color:#FFFFFF;font-family:'Caveat',cursive;font-size:28px;font-weight:700;text-align:center">{{ lb.cap }}</div>
+      <div style="display:flex;gap:10px">
+        <button onClick="{{ lbPrev }}" aria-label="Previous photo" style="width:48px;height:48px;border-radius:50%;border:0;background:#F4E9D6;color:#2E2117;font:800 20px Figtree,sans-serif;cursor:pointer">‹</button>
+        <button onClick="{{ closeLb }}" style="height:48px;border-radius:999px;border:0;background:#F4E9D6;color:#2E2117;font:700 15px Figtree,sans-serif;cursor:pointer;padding:0 20px">Close</button>
+        <button onClick="{{ lbNext }}" aria-label="Next photo" style="width:48px;height:48px;border-radius:50%;border:0;background:#F4E9D6;color:#2E2117;font:800 20px Figtree,sans-serif;cursor:pointer">›</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ upOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:2100;background:rgba(18,24,29,.7);display:flex;align-items:flex-end;justify-content:center;padding:12px">
+      <div style="background:#F6EEE0;color:#2E2117;border-radius:26px;width:100%;max-width:520px;max-height:88vh;overflow:auto;padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+        <sc-if value="{{ up.needKey }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px">Set up uploads on this phone</div>
+            <div style="font-size:15px;line-height:1.45;color:#3E4A54;text-wrap:pretty">Paste the GitHub upload key. You only do this once per phone.</div>
+            <input type="password" value="{{ up.keyDraft }}" onChange="{{ setKeyDraft }}" placeholder="github_pat_…" autocomplete="off" style="min-height:48px;border:2px solid #D9C3A0;border-radius:14px;padding:0 14px;font:500 16px Figtree,sans-serif;background:#F4E9D6;color:#2E2117">
+          </div>
+        </sc-if>
+        <sc-if value="{{ up.hasItems }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px">{{ up.title }}</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span style="font-size:14px;font-weight:700;color:#5E4B3A">Posting as</span>
+              <button onClick="{{ whoKyle }}" style="min-height:40px;border:0;border-radius:999px;padding:0 16px;font:700 14px Figtree,sans-serif;cursor:pointer;background:{{ up.kyleBg }};color:{{ up.kyleInk }}">Kyle</button>
+              <button onClick="{{ whoTJ }}" style="min-height:40px;border:0;border-radius:999px;padding:0 16px;font:700 14px Figtree,sans-serif;cursor:pointer;background:{{ up.tjBg }};color:{{ up.tjInk }}">TJ</button>
+            </div>
+            <sc-for list="{{ up.items }}" as="it" hint-placeholder-count="1">
+              <div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:center">
+                <img src="{{ it.url }}" alt="" style="width:72px;height:72px;object-fit:cover;border:5px solid #FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.15)">
+                <input value="{{ it.cap }}" onChange="{{ it.setCap }}" maxlength="80" placeholder="Add a caption" style="min-height:48px;border:2px solid #D9C3A0;border-radius:14px;padding:0 14px;font:600 20px Caveat,cursive;background:#F4E9D6;color:#2E2117;min-width:0">
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ up.msg }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;font-weight:700;color:{{ up.msgInk }}">{{ up.msg }}</div></sc-if>
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+          <button onClick="{{ closeUp }}" style="min-height:48px;border:0;border-radius:999px;padding:0 18px;background:transparent;color:#3E4A54;font:700 15px Figtree,sans-serif;cursor:pointer">Cancel</button>
+          <button onClick="{{ upGo }}" disabled="{{ up.busy }}" style="min-height:48px;border:0;border-radius:999px;padding:0 22px;background:#5C3D24;color:#FFFFFF;font:800 15px Figtree,sans-serif;cursor:pointer;opacity:{{ up.goOp }}">{{ up.goLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PASS_HASH = 'ccd35f8a0b2d69e0c5174e2a66b6b5023a859be9e7ba8863d44dfea72c29e4e6';
+const ADMIN_HASH = '7bbe2849ac7db23157eb36abee4a452840f4b3e236b6e803c99a4ca3693c6f0a';
+const FAM_WRAP = 'v7cRT9TXbdfV+2AJIumxmK3+GPN1dMbAyDTlXkv/4/Y9qGs=';
+const TOPIC = 'kt-th26-q8v3m7x2r5';
+const FLIGHT_PROXY = '';
+const LEAD_MIN = FLIGHT_PROXY ? 2 : 20; // free flight data runs behind, so project the plane this many minutes ahead // optional: your Cloudflare Worker URL ending in "/callsign/" for the most reliable live tracking
+const ACC = 'oklch(0.58 0.11 35)', SEA = 'oklch(0.58 0.11 225)', GO = 'oklch(0.55 0.11 150)', AMB = 'oklch(0.62 0.12 75)';
+const BKK = 'Asia/Bangkok', CHI = 'America/Chicago', NYC = 'America/New_York', LAX = 'America/Los_Angeles', TPE = 'Asia/Taipei';
+const ZL = { [BKK]: 'Bangkok time', [TPE]: 'Taipei time', [CHI]: 'Chicago time', [LAX]: 'LA time', [NYC]: 'New England time' };
+const NOW_ART = {
+  delta: ['r2-08-plane-delta-heads', 'r2-08-plane-delta'], eva: ['r2-09-plane-eva-air-heads', 'r2-09-plane-eva-air'], pg: ['r2-10-plane-bangkok-airways-heads', 'r2-10-plane-bangkok-airways'],
+  lax: ['r2-17-la-palms-sunset', 'r2-17-la-palms-sunset'], tpe: ['r2-18-taipei-101', 'r2-18-taipei-101'], ord: ['r2-11-chicago-skyline', 'r2-11-chicago-skyline'], msp: ['r2-08-plane-delta', 'r2-08-plane-delta'],
+  bkka: ['05-thai-flag', 'curry'], usma: ['05-thai-flag', 'karst'], cnxa: ['05-thai-flag', 'chedi'],
+  york: ['r2-05-grammy-tims-house', 'barn'], usm: ['32-pool-villa-resort', 'karst'], cnx: ['r2-06-hotel-aleenta-chiang-mai', 'chedi'], bkk: ['r2-07-hotel-waldorf-astoria-bangkok', 'curry'],
+  drive: ['r2-01-jeep-driving-kona-rio', 'jeep'], home: ['r2-15-lighthouse', 'r2-15-lighthouse'],
+};
+const S = n => 'assets/stickers/' + n + '.png';
+const PH = n => 'assets/photos/' + n;
+const STICKERS = ['r2-09-plane-eva-air', '15-elephant', 'karst', 'r2-18-taipei-101', 'chedi', '05-thai-flag', 'r2-03-kona-rio', 'curry', 'r2-08-plane-delta', '32-pool-villa-resort', 'r2-17-la-palms-sunset', 'polaroid', 'r2-22-birthday-cake', 'r2-10-plane-bangkok-airways', 'barn', 'r2-15-lighthouse', 'jeep', 'moon'];
+const HOME_STICKER = 'assets/stickers/milford-harbor.png';
+
+const P = {
+  home: { name: 'Home sweet home', place: 'Milford, Connecticut', city: 'Milford', ll: [41.2223, -73.0565], tz: NYC, sticker: 'home', blurb: 'Where it all starts and ends. A little harbor town on the Connecticut shore.', q: 'Milford, CT' },
+  york: { name: "Grammy & Tim's", place: 'Yorkville, Illinois', city: 'Yorkville', ll: [41.6411, -88.4473], tz: CHI, sticker: 'r2-05-grammy-tims-house', photo: PH('yorkville-cartoon.jpg'), blurb: 'Kona & Rio are staying with Grammy & Tim. The Jeep stays parked here while we are in Thailand.', q: 'Yorkville, IL' },
+  ord: { airport: true, sticker: 'r2-11-chicago-skyline', code: 'ORD', city: 'Chicago', name: "Chicago O'Hare", ll: [41.9786, -87.9048], tz: CHI, wx: 'york' },
+  lax: { airport: true, sticker: 'r2-17-la-palms-sunset', code: 'LAX', city: 'Los Angeles', name: 'Los Angeles International', blurb: 'Dinner with Doug and Fan.', ll: [33.9416, -118.4085], tz: LAX, wx: 'lax' },
+  tpe: { airport: true, sticker: 'r2-18-taipei-101', code: 'TPE', city: 'Taipei', name: 'Taipei Taoyuan', ll: [25.0797, 121.2342], tz: TPE, wx: 'tpe' },
+  msp: { airport: true, code: 'MSP', city: 'Minneapolis', name: 'Minneapolis-Saint Paul', ll: [44.8848, -93.2223], tz: CHI, wx: 'msp' },
+  bkka: { airport: true, code: 'BKK', city: 'Bangkok', name: 'Bangkok Suvarnabhumi', ll: [13.69, 100.7501], tz: BKK, wx: 'bkk' },
+  usma: { airport: true, code: 'USM', city: 'Koh Samui', name: 'Samui International', ll: [9.5478, 100.0623], tz: BKK, wx: 'usm' },
+  cnxa: { airport: true, code: 'CNX', city: 'Chiang Mai', name: 'Chiang Mai International', ll: [18.7668, 98.9626], tz: BKK, wx: 'cnx' },
+  usm: { hotel: true, name: 'Conrad Koh Samui', place: 'Koh Samui', city: 'Koh Samui', ll: [9.429, 99.9277], tz: BKK, sticker: '32-pool-villa-resort', photo: PH('conrad.jpg'), url: 'https://www.hilton.com/en/hotels/usmksci-conrad-koh-samui/', tel: '+6677915888', telLabel: '+66 77 915 888', address: '49/8-9 Hillcrest Road, Tambon Taling Ngam, Koh Samui, Surat Thani 84140', room: '2-bedroom ocean-view pool villa', cin: 'Check in Sun 3:00 PM', cout: 'Check out Thu early morning (early flight)', blurb: "Pool villas stacked up a jungle hillside on Samui's quiet southwest coast, with sunset views over the Five Islands." },
+  cnx: { hotel: true, name: 'Aleenta Retreat Chiang Mai', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.7935, 98.964], tz: BKK, sticker: 'r2-06-hotel-aleenta-chiang-mai', photo: PH('aleenta.jpg'), url: 'https://www.aleenta.com/en/aleenta-retreat-chiang-mai', tel: '+6621808001', telLabel: '+66 2 180 8001', address: '189 Soi Ban Mai Lang Moo 18, Suthep, Mueang Chiang Mai, Chiang Mai 50200', room: '1-bedroom pool residence', cin: 'Check in Thu 3:00 PM (12:00 PM if ready)', cout: 'Check out Mon 12:00 PM (4:00 PM if available)', blurb: 'A teak-and-courtyard wellness retreat at the foot of Doi Suthep, near the Nimman neighborhood.' },
+  bkk: { hotel: true, name: 'Waldorf Astoria Bangkok', place: 'Bangkok', city: 'Bangkok', ll: [13.7445, 100.5402], tz: BKK, sticker: 'r2-07-hotel-waldorf-astoria-bangkok', photo: PH('waldorf.jpg'), url: 'https://www.hilton.com/en/hotels/bkkwawa-waldorf-astoria-bangkok/', tel: '+6628468888', telLabel: '+66 2 846 8888', address: '151 Ratchadamri Road, Lumphini, Pathum Wan, Bangkok 10330', room: 'Deluxe king room', cin: 'Check in Mon 3:00 PM', cout: 'Check out Thu 4:00 PM (late check-out)', blurb: 'A slim, curvy glass tower on Ratchadamri Road overlooking the Royal Bangkok Sports Club, with a rooftop pool and bars up top.' },
+  pups: { poi: true, sticker: 'r2-03-kona-rio', name: 'Kona & Rio', place: 'Yorkville, Illinois', city: 'Yorkville', ll: [41.585, -88.3], tz: CHI, wx: 'york', dates: 'The whole trip', blurb: 'Kona & Rio are staying with Grammy & Tim.' },
+  ele: { poi: true, sticker: '15-elephant', label: 'Elephants', name: 'Elephant Nature Park', place: 'Chiang Mai', city: 'Chiang Mai', ll: [19.2156, 98.8592], tz: BKK, wx: 'cnx', dates: 'Fri Oct 23', blurb: 'Half-day morning visit. A guided walk with rescued elephants, then lunch at the park.' },
+  doi: { poi: true, sticker: 'chedi', name: 'Wat Phra That Doi Suthep', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.8048, 98.9216], tz: BKK, wx: 'cnx', dates: 'Sat Oct 24, 9:00 AM', blurb: 'The golden temple on the mountain, first thing on TJ\'s birthday.' },
+  cdl: { poi: true, sticker: '09-temple', label: 'Wat Chedi Luang', name: 'Wat Chedi Luang', place: 'Chiang Mai Old City', city: 'Chiang Mai', ll: [18.7869, 98.9865], tz: BKK, wx: 'cnx', dates: 'Sun Oct 25, 10:00 AM', blurb: 'Old City temples, starting with the huge ruined chedi.' },
+  nbz: { poi: true, sticker: '43-night-market', label: 'Night Bazaar', name: 'Chiang Mai Night Bazaar', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.7859, 99.0003], tz: BKK, wx: 'cnx', dates: 'Thu Oct 22, 7:00 PM', blurb: 'First night in Chiang Mai. Street food and wandering.' },
+  wsm: { poi: true, label: 'Walking Street', name: 'Sunday Walking Street', place: 'Tha Phae Gate, Chiang Mai', city: 'Chiang Mai', ll: [18.7877, 98.9934], tz: BKK, wx: 'cnx', dates: 'Sun Oct 25, 5:00 PM', blurb: 'The big Sunday night market that starts at Tha Phae Gate.' },
+  blk: { poi: true, sticker: 'r2-22-birthday-cake', label: 'Birthday dinner', name: 'Blackitch Artisan Kitchen', place: 'Nimmanhaemin Soi 7, Chiang Mai', city: 'Chiang Mai', ll: [18.7981, 98.9695], tz: BKK, wx: 'cnx', dates: 'Sat Oct 24, 5:00 PM', blurb: "TJ's birthday dinner. 12 creative Asian courses, listed in the 2026 MICHELIN Guide Thailand." },
+  mall: { poi: true, sticker: 'r2-20-shopping', label: 'Mall day', name: 'CentralWorld (probably)', place: 'Bangkok', city: 'Bangkok', ll: [13.7466, 100.5393], tz: BKK, wx: 'bkk', dates: 'Tue Oct 27, 12:00 PM', blurb: 'Mall day near the Waldorf, then a rooftop bar for sunset.' },
+  tat: { poi: true, sticker: 'r2-19-tattoo', label: 'Tattoo', name: 'All Day Tattoo', place: 'Sukhumvit Soi 47, Phrom Phong', city: 'Bangkok', ll: [13.733, 100.5717], tz: BKK, wx: 'bkk', url: 'https://alldaytattoo.com', dates: 'Wed Oct 28, 12:00 PM', blurb: 'TJ and Kyle both plan to get tattoos at this highly regarded Bangkok shop.' },
+};
+const VIA = [[41.05, -74.6], [41.1, -77.6], [41.2, -81.5], [41.6, -86.5]];
+const RAW = [
+  { k: 'drive', from: 'home', to: 'york', via: VIA, s: '2026-10-13T03:00-04:00', e: '2026-10-13T18:00-05:00' },
+  { k: 'stay', p: 'york', e: '2026-10-16T12:30-05:00' },
+  { k: 'airport', p: 'ord', e: '2026-10-16T14:45-05:00' },
+  { k: 'flight', from: 'ord', to: 'lax', air: 'Delta', num: 'DL 967', cs: 'DAL967', e: '2026-10-16T17:16-07:00' },
+  { k: 'airport', p: 'lax', e: '2026-10-17T00:50-07:00' },
+  { k: 'flight', from: 'lax', to: 'tpe', air: 'EVA Air', num: 'BR 15', cs: 'EVA15', e: '2026-10-18T05:45+08:00' },
+  { k: 'airport', p: 'tpe', e: '2026-10-18T08:20+08:00' },
+  { k: 'flight', from: 'tpe', to: 'bkka', air: 'EVA Air', num: 'BR 211', cs: 'EVA211', e: '2026-10-18T11:10+07:00' },
+  { k: 'airport', p: 'bkka', e: '2026-10-18T14:40+07:00' },
+  { k: 'flight', from: 'bkka', to: 'usma', air: 'Bangkok Airways', num: 'PG 151', cs: 'BKP151', e: '2026-10-18T15:45+07:00' },
+  { k: 'stay', p: 'usm', e: '2026-10-22T07:30+07:00' },
+  { k: 'airport', p: 'usma', e: '2026-10-22T08:55+07:00' },
+  { k: 'flight', from: 'usma', to: 'cnxa', air: 'Bangkok Airways', num: 'PG 241', cs: 'BKP241', e: '2026-10-22T10:40+07:00' },
+  { k: 'stay', p: 'cnx', e: '2026-10-26T12:00+07:00' },
+  { k: 'flight', from: 'cnxa', to: 'bkka', tbd: true, air: 'Chiang Mai to Bangkok', e: '2026-10-26T15:00+07:00' },
+  { k: 'stay', p: 'bkk', e: '2026-10-29T14:00+07:00' },
+  { k: 'airport', p: 'bkka', e: '2026-10-29T17:15+07:00' },
+  { k: 'flight', from: 'bkka', to: 'tpe', air: 'EVA Air', num: 'BR 68', cs: 'EVA68', e: '2026-10-29T21:50+08:00' },
+  { k: 'airport', p: 'tpe', e: '2026-10-29T23:55+08:00' },
+  { k: 'flight', from: 'tpe', to: 'lax', air: 'EVA Air', num: 'BR 16', cs: 'EVA16', e: '2026-10-29T20:35-07:00' },
+  { k: 'airport', p: 'lax', e: '2026-10-29T23:59-07:00' },
+  { k: 'flight', from: 'lax', to: 'msp', air: 'Delta', num: 'DL 430', cs: 'DAL430', e: '2026-10-30T05:36-05:00' },
+  { k: 'airport', p: 'msp', e: '2026-10-30T07:00-05:00' },
+  { k: 'flight', from: 'msp', to: 'ord', air: 'Delta', num: 'DL 4712', cs: 'DAL4712', e: '2026-10-30T08:44-05:00' },
+  { k: 'stay', p: 'york', e: '2026-11-01T00:00-05:00' },
+  { k: 'homeday', from: 'york', to: 'home', e: '2026-11-02T00:00-05:00' },
+];
+const SEGS = (() => { let prev = null; return RAW.map(r => { const s = r.s ? Date.parse(r.s) : prev; const e = Date.parse(r.e); prev = e; return Object.assign({}, r, { s, e }); }); })();
+const T0 = SEGS[0].s, T1 = SEGS[SEGS.length - 1].e;
+const RETURN_T = Date.parse('2026-10-29T00:00+07:00');
+
+const DAYS = [
+  { d: '2026-10-13', off: '-05:00', where: 'Milford to Yorkville', title: 'On the road', p: 'york', stamp: 'Made it', items: [['2026-10-13T03:00-04:00', '3:00 AM ET: Leave home in Milford in the Jeep with Kona and Rio (coffee and donuts)'], [null, 'Drive straight through, all in one day, about 15 hours'], ['2026-10-13T18:00-05:00', "6:00 PM CT: Arrive at Grammy & Tim's in Yorkville"]] },
+  { d: '2026-10-14', off: '-05:00', where: 'Yorkville', title: 'Family time', p: 'york', items: [[null, 'Breakfast with Lo & Aunt Chele'], [null, 'Family time with Grammy & Tim'], [null, 'Kona and Rio settling in'], ['2026-10-14T19:00-05:00', 'Dinner with Dad and Laura at Touche in Aurora, IL']] },
+  { d: '2026-10-15', off: '-05:00', where: 'Yorkville', title: 'Pack, repack, re-repack', p: 'york', items: [[null, 'Family time'], [null, 'Packing, repacking, re-repacking']] },
+  { d: '2026-10-16', off: '-07:00', where: 'Chicago to LA', title: 'Wheels up', p: 'lax', stamp: 'Wheels up', items: [['2026-10-16T14:45-05:00', "2:45 PM CT: Delta 967, O'Hare to LA"], ['2026-10-16T17:16-07:00', '5:16 PM PT: Land in LA'], ['2026-10-16T18:30-07:00', "Dinner with Doug and Fan"], ['2026-10-17T00:50-07:00', '12:50 AM PT (after midnight): EVA 15 overnight to Taipei']] },
+  { d: '2026-10-17', off: '+08:00', where: 'Over the Pacific', title: 'The day that disappears', p: 'tpe', stamp: 'Poof', items: [[null, 'Somewhere over the Pacific, crossing the international date line'], [null, 'We skip Saturday completely']] },
+  { d: '2026-10-18', off: '+07:00', where: 'Bangkok to Koh Samui', title: 'Hello, Thailand!', p: 'usm', stamp: 'Arrived', items: [['2026-10-18T05:45+08:00', '5:45 AM Taipei: Land in Taipei'], ['2026-10-18T08:20+08:00', '8:20 AM Taipei: EVA 211 to Bangkok'], ['2026-10-18T11:10+07:00', '11:10 AM: Land in Bangkok'], ['2026-10-18T14:40+07:00', '2:40 PM: Bangkok Airways 151 to Koh Samui'], ['2026-10-18T15:45+07:00', '3:45 PM: Land on Koh Samui'], [null, 'Check in to the Conrad pool villa']] },
+  { d: '2026-10-19', off: '+07:00', where: 'Koh Samui', title: 'First full day on Koh Samui', star: true, p: 'usm', items: [[null, 'Still adjusting to the time zone, 11 hours ahead of home'], [null, 'Sunrise on the ocean'], [null, 'Thai coffee'], ['2026-10-19T07:20+07:00', '7:20 AM: Cowboys vs. Packers'], [null, 'Pool day']] },
+  { d: '2026-10-20', off: '+07:00', where: 'Koh Samui', title: 'Massage & spa day', p: 'usm', items: [[null, 'Massages at the Conrad Spa'], [null, 'Samui Embrace sounds great for TJ']] },
+  { d: '2026-10-21', off: '+07:00', where: 'Koh Samui', title: 'Last island day', p: 'usm', items: [[null, 'Pool villa and the Five Islands sunset'], [null, 'Private BBQ in our villa with our own chef, out on the terrace under the stars'], [null, 'Premium cuts and fresh local seafood off the grill']] },
+  { d: '2026-10-22', off: '+07:00', where: 'Koh Samui to Chiang Mai', title: 'North to the mountains', p: 'cnx', items: [[null, 'Early check-out from the Conrad'], ['2026-10-22T08:55+07:00', '8:55 AM: Bangkok Airways 241 to Chiang Mai'], ['2026-10-22T10:40+07:00', '10:40 AM: Land in Chiang Mai'], ['2026-10-22T15:00+07:00', '3:00 PM: Check in at the Aleenta (12:00 PM if the room is ready)'], ['2026-10-22T19:00+07:00', '7:00 PM: Chiang Mai Night Bazaar']] },
+  { d: '2026-10-23', off: '+07:00', where: 'Chiang Mai', title: 'Elephant day', p: 'ele', star: true, stamp: 'Elephants', items: [['2026-10-23T07:30+07:00', '7:30 to 8:00 AM: Pickup at the Aleenta for Elephant Nature Park'], [null, 'Guided walk with the elephants'], ['2026-10-23T12:00+07:00', '12:00 PM: Lunch at the park'], ['2026-10-23T14:00+07:00', '2:00 to 2:30 PM: Back at the Aleenta'], ['2026-10-23T19:00+07:00', '7:00 PM: Dinner and a night market stroll']] },
+  { d: '2026-10-24', off: '+07:00', where: 'Chiang Mai', title: "TJ's birthday!", p: 'blk', star: true, stamp: 'Happy birthday', items: [['2026-10-24T09:00+07:00', '9:00 AM: Wat Phra That Doi Suthep, the golden temple on the mountain'], ['2026-10-24T17:00+07:00', "5:00 PM: TJ's birthday dinner, 12 courses at Blackitch Artisan Kitchen"]] },
+  { d: '2026-10-25', off: '+07:00', where: 'Chiang Mai', title: 'Temples and markets', p: 'wsm', items: [['2026-10-25T10:00+07:00', '10:00 AM: Old City temples, Wat Chedi Luang'], ['2026-10-25T17:00+07:00', '5:00 PM: Sunday Walking Street night market at Tha Phae Gate']] },
+  { d: '2026-10-26', off: '+07:00', where: 'Chiang Mai to Bangkok', title: 'On to the last leg', p: 'bkk', items: [['2026-10-26T12:00+07:00', '12:00 PM: Check out of the Aleenta (late check-out to 4 PM if available)'], [null, 'Fly to Bangkok (flight number coming soon)'], ['2026-10-26T15:00+07:00', '3:00 PM: Check in at the Waldorf Astoria'], ['2026-10-26T19:00+07:00', '7:00 PM: Street food night in Chinatown (Yaowarat)']] },
+  { d: '2026-10-27', off: '+07:00', where: 'Bangkok', title: 'Shop and sip', p: 'mall', items: [['2026-10-27T12:00+07:00', '12:00 PM: Mall day (probably CentralWorld, near the Waldorf)'], ['2026-10-27T18:00+07:00', '6:00 PM: Rooftop bar for sunset']] },
+  { d: '2026-10-28', off: '+07:00', where: 'Bangkok', title: 'Tattoo day', p: 'tat', star: true, stamp: 'Inked', items: [['2026-10-28T12:00+07:00', '12:00 PM: TJ and Kyle both plan to get tattoos at All Day Tattoo, a highly regarded shop on Sukhumvit Soi 47'], [null, 'Last night in Bangkok']] },
+  { d: '2026-10-29', off: '-07:00', where: 'Bangkok to LA', title: 'The long way home', p: 'lax', items: [[null, 'Check out of the Waldorf'], ['2026-10-29T14:00+07:00', '2:00 PM: Leave for the airport'], ['2026-10-29T17:15+07:00', '5:15 PM: EVA 68 to Taipei'], ['2026-10-29T23:55+08:00', '11:55 PM Taipei: EVA 16 to LA'], ['2026-10-29T20:35-07:00', '8:35 PM PT: Land in LA, before we took off'], ['2026-10-29T23:59-07:00', '11:59 PM PT: Delta 430 to Minneapolis']] },
+  { d: '2026-10-30', off: '-05:00', where: 'Minneapolis to Chicago', title: 'Home-ish', p: 'york', stamp: 'Reunited', items: [['2026-10-30T05:36-05:00', '5:36 AM CT: Land in Minneapolis'], ['2026-10-30T07:00-05:00', '7:00 AM CT: Delta 4712 to Chicago'], ['2026-10-30T08:44-05:00', "8:44 AM CT: Land at O'Hare"], [null, 'Reunion with Kona and Rio!']] },
+  { d: '2026-10-31', off: '-05:00', where: 'Yorkville', title: 'Halloween', p: 'york', items: [[null, 'Halloween with the family']] },
+  { d: '2026-11-01', off: '-06:00', where: 'Yorkville to Milford', title: 'Back to CT', p: 'home', stamp: 'Home safe', items: [[null, 'Clocks fell back an hour overnight'], [null, 'Drive home to Milford with Kona and Rio']] },
+].map(x => Object.assign(x, { start: Date.parse(x.d + 'T00:00:00' + x.off), end: Date.parse(x.d + 'T23:59:59' + x.off), items: x.items.map(([iso, text]) => ({ at: iso ? Date.parse(iso) : null, text })) }));
+
+const DAY_STK = {
+  '2026-10-13': ['r2-01-jeep-driving-kona-rio', 'r2-13-covered-bridge'], '2026-10-14': ['r2-05-grammy-tims-house', 'r2-03-kona-rio'], '2026-10-15': ['06-passport', 'r2-03-kona-rio'],
+  '2026-10-16': ['r2-08-plane-delta', 'r2-17-la-palms-sunset'], '2026-10-17': ['r2-09-plane-eva-air', 'r2-18-taipei-101'], '2026-10-18': ['05-thai-flag', '32-pool-villa-resort'],
+  '2026-10-19': ['32-pool-villa-resort', '08-coconut'], '2026-10-20': ['20-beach', '18-mango-sticky-rice'], '2026-10-21': ['42-palm-sunset', 'karst'],
+  '2026-10-22': ['r2-06-hotel-aleenta-chiang-mai', '43-night-market'], '2026-10-23': ['15-elephant'], '2026-10-24': ['r2-22-birthday-cake', 'chedi'],
+  '2026-10-25': ['09-temple', '43-night-market'], '2026-10-26': ['r2-07-hotel-waldorf-astoria-bangkok', '29-street-food-cart'], '2026-10-27': ['r2-20-shopping', 'r2-21-rooftop'],
+  '2026-10-28': ['r2-19-tattoo', '11-tuk-tuk'], '2026-10-29': ['r2-09-plane-eva-air', 'r2-17-la-palms-sunset'], '2026-10-30': ['r2-08-plane-delta', 'r2-03-kona-rio'],
+  '2026-10-31': ['r2-05-grammy-tims-house', 'barn'], '2026-11-01': ['r2-01-jeep-driving-kona-rio', 'r2-15-lighthouse'],
+};
+const FAMILIES = [
+  { title: "Kyle's family", face: 'r2-04-kyle-green-cap', tint: 'oklch(0.93 0.06 150)', people: [['Kyle', '', '8604590042'], ['Wayne', '(Dad)', '8604599255'], ['Lori', '(Mom)', '8604598159'], ['Staci', '(Sister)', '8604597473']] },
+  { title: "TJ's family", face: '02b-tj-headshot', tint: 'oklch(0.93 0.06 60)', people: [['TJ', '', '6307465566'], ['Michelle', '(Mom)', '6306738585'], ['Tim', '(Dad)', '6304609540'], ['Laura', '(Step Mom)', '8476095057']] },
+];
+const BUCKET = [
+  { title: 'Eat', items: [
+    ['curry', 'Green curry and satay', 'Anywhere, often', 'curry'],
+    ['padthai', 'Pad thai from a street cart', 'Bangkok'],
+    ['mango', 'Mango sticky rice', 'Everywhere'],
+    ['khaosoi', 'Khao soi', 'Chiang Mai'],
+    ['coconut', 'Fresh coconut on the beach', 'Koh Samui'],
+    ['blackitch', '12 courses at Blackitch', "Chiang Mai, TJ's birthday"],
+    ['pizza', 'Connecticut pizza once we are home', 'Back home', 'pizza'],
+  ] },
+  { title: 'Do', items: [
+    ['elephants', 'Elephant Nature Park', 'Chiang Mai'],
+    ['doisuthep', 'Wat Phra That Doi Suthep', 'Chiang Mai', 'chedi'],
+    ['walking', 'Sunday Walking Street', 'Chiang Mai'],
+    ['fiveislands', 'Five Islands sunset from the villa', 'Koh Samui', 'karst'],
+    ['rooftop', 'Rooftop bar at sunset', 'Bangkok'],
+    ['tattoo', 'Tattoos at All Day Tattoo', 'Bangkok'],
+    ['streetfood', 'Street food night in Chinatown', 'Bangkok'],
+    ['stars', 'Stargazing from the pool', 'Koh Samui', 'moon'],
+    ['polaroid', 'Polaroids of everything', 'Everywhere', 'polaroid'],
+  ] },
+];
+const PHOTOS = [];
+const GH_REPO = ''; // 'username/repo'. Leave blank to auto-detect on GitHub Pages.
+const GH_BRANCH = 'main', ALBUM_DIR = 'trip-photos';
+const NAV_IDS = ['now', 'map', 'days', 'stays', 'flights', 'contacts', 'photos'];
+const ghRepo = () => { if (GH_REPO) return GH_REPO; if (!/\.github\.io$/.test(location.hostname)) return ''; const seg = location.pathname.split('/')[1]; return location.hostname.split('.')[0] + '/' + (seg && !seg.includes('.') ? seg : location.hostname); };
+const capEnc = t => { const b = new TextEncoder().encode(t); let x = ''; b.forEach(c => { x += String.fromCharCode(c); }); return btoa(x).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+const capDec = t => { try { const x = atob(t.replace(/-/g, '+').replace(/_/g, '/')); return new TextDecoder().decode(Uint8Array.from(x, c => c.charCodeAt(0))); } catch (e) { return ''; } };
+const parsePhoto = f => { const p = f.name.split('.'); return { name: f.name, url: f.url, ts: +p[0] || 0, who: p.length > 3 ? p[1] : '', cap: p.length > 3 ? capDec(p[2]) : '' }; };
+
+const D = Math.PI / 180;
+const fmt = (ms, tz, o) => new Intl.DateTimeFormat('en-US', Object.assign({ timeZone: tz }, o)).format(ms);
+const tm = (ms, tz) => fmt(ms, tz, { hour: 'numeric', minute: '2-digit' });
+const dy = (ms, tz) => fmt(ms, tz, { weekday: 'short', month: 'short', day: 'numeric' });
+const md = (ms, tz) => fmt(ms, tz, { month: 'short', day: 'numeric' });
+const wtm = (ms, tz) => fmt(ms, tz, { weekday: 'short' }) + ' ' + tm(ms, tz);
+const hourOf = (ms, tz) => +new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(ms);
+function tzOff(tz, ms) { const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(ms); const g = k => +p.find(x => x.type === k).value; return (Date.UTC(g('year'), g('month') - 1, g('day'), g('hour') % 24, g('minute')) - Math.floor(ms / 60000) * 60000) / 3600000; }
+const dur = ms => { const m = Math.max(0, Math.round(ms / 60000)), h = Math.floor(m / 60); return h ? h + (h === 1 ? ' hr' : ' hrs') + (m % 60 ? ' ' + (m % 60) + ' min' : '') : (m % 60) + ' min'; };
+const toV = ([a, b]) => [Math.cos(a * D) * Math.cos(b * D), Math.cos(a * D) * Math.sin(b * D), Math.sin(a * D)];
+function gc(p, q, f) {
+  const A = toV(p), B = toV(q), d = Math.acos(Math.min(1, A[0] * B[0] + A[1] * B[1] + A[2] * B[2]));
+  if (d < 1e-9) return p;
+  const s1 = Math.sin((1 - f) * d) / Math.sin(d), s2 = Math.sin(f * d) / Math.sin(d);
+  const v = [0, 1, 2].map(i => s1 * A[i] + s2 * B[i]);
+  return [Math.atan2(v[2], Math.hypot(v[0], v[1])) / D, Math.atan2(v[1], v[0]) / D];
+}
+function destPt([la, lo], brgDeg, dKm) { const R = 6371, d = dKm / R, b = brgDeg * D, p1 = la * D, l1 = lo * D; const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(b)); const l2 = l1 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2)); return [p2 / D, ((l2 / D + 540) % 360) - 180]; }
+function isWest(a, b) { const n = gc(a, b, 0.02); let d = n[1] - a[1]; if (d > 180) d -= 360; if (d < -180) d += 360; return d < 0; }
+const planeKey = air => /Bangkok Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+const DAY_WEST = { '2026-10-16': true, '2026-10-17': true };
+function km(p, q) { const a = Math.sin((q[0] - p[0]) * D / 2) ** 2 + Math.cos(p[0] * D) * Math.cos(q[0] * D) * Math.sin((q[1] - p[1]) * D / 2) ** 2; return 12742 * Math.asin(Math.sqrt(a)); }
+function along(pts, f) {
+  const L = []; let tot = 0;
+  for (let i = 1; i < pts.length; i++) { const d = km(pts[i - 1], pts[i]); L.push(d); tot += d; }
+  let target = f * tot;
+  for (let i = 0; i < L.length; i++) { if (target <= L[i]) { const r = L[i] ? target / L[i] : 0; return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * r, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * r]; } target -= L[i]; }
+  return pts[pts.length - 1];
+}
+function sunAlt(lat, lon, ms) {
+  const d = ms / 86400000 + 2440587.5 - 2451545.0, g = (357.529 + 0.98560028 * d) * D, q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * D, e = (23.439 - 0.00000036 * d) * D;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24, ha = (gmst * 15 + lon) * D - ra;
+  return Math.asin(Math.sin(lat * D) * Math.sin(dec) + Math.cos(lat * D) * Math.cos(dec) * Math.cos(ha)) / D;
+}
+const mll = ([a, b]) => [a, b < 0 ? b + 360 : b];
+function unwrap(arr) { for (let i = 1; i < arr.length; i++) { while (arr[i][1] - arr[i - 1][1] > 180) arr[i][1] -= 360; while (arr[i][1] - arr[i - 1][1] < -180) arr[i][1] += 360; } return arr; }
+const drivePts = sg => [P[sg.from].ll].concat(sg.via, [P[sg.to].ll]);
+const WMO = c => c === 0 ? 'Clear' : c <= 2 ? 'Partly cloudy' : c === 3 ? 'Cloudy' : c <= 48 ? 'Foggy' : c <= 57 ? 'Drizzle' : c <= 67 ? 'Rain' : c <= 77 ? 'Snow' : c <= 82 ? 'Showers' : c <= 86 ? 'Snow showers' : 'Thunderstorms';
+const wxStr = w => w ? Math.round(w.f) + '°F · ' + Math.round((w.f - 32) * 5 / 9) + '°C' : 'Weather loading';
+const mapsUrl = p => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.address ? p.name + ', ' + p.address : p.poi ? p.name + ', ' + p.place : (p.q || p.name + ' ' + p.city));
+const wxUrl = city => 'https://www.google.com/search?q=' + encodeURIComponent('weather ' + city);
+const ago = ms => { const m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' hr ago' : Math.round(m / 1440) + ' days ago'; };
+const b64 = u => btoa(String.fromCharCode.apply(null, u));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function sha(s) { const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(h)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const VISITOR_TZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || CHI; } catch (e) { return CHI; } })();
+const URL_NOW = (() => { try { const v = new URLSearchParams(location.search).get('now'); const ms = v ? Date.parse(v) : NaN; return isNaN(ms) ? null : ms; } catch (e) { return null; } })();
+const ADMIN = (() => { try {  const v = localStorage.getItem('kt_admin'); return v === 'true' || v === '"true"' || v === 'true\n'; } catch (e) { return false; } })();
+const inTHll = ll => ll[1] > 97 && ll[1] < 106 && ll[0] > 5 && ll[0] < 21;
+
+class Component extends DCLogic {
+  state = { role: null, admin: ADMIN, album: ls.get('kt_album', []), up: null, who: ls.get('kt_who', ''), phase: 'checking', pass: '', err: '', now: Date.now(), si: 0, wx: {}, fix: ls.get('kt_fix', null), fixArea: '', fixWx: null, sel: null, view: null, checked: ls.get('kt_bucket', {}), copied: null, lb: null, share: null, lastSent: null, shareErr: '', wake: false, adsb: null, status: null };
+
+  async componentDidMount() {
+    this._spy = () => { if (this._spyR) return; this._spyR = requestAnimationFrame(() => { this._spyR = 0; let on = 'now'; for (const id of NAV_IDS) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < 150) on = id; } if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 4) on = 'photos'; if (on !== this.state.navOn) this.setState({ navOn: on }); }); };
+    window.addEventListener('scroll', this._spy, { passive: true });
+    this.loadAlbum(); this._albumT = setInterval(() => this.loadAlbum(), 300000);
+    if ('serviceWorker' in navigator && location.protocol === 'https:' && !/\.dc\.html$/.test(location.pathname)) navigator.serviceWorker.register('sw.js').catch(() => {});
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.bip = e; this.setState({ canPrompt: true }); });
+    window.addEventListener('appinstalled', () => this.setState({ installed: true }));
+    this.rot = setInterval(() => { if (this.state.phase !== 'open') this.setState(s => ({ si: s.si + 1 })); }, 3000);
+    const saved = /[?&]gate=1/.test(location.search) ? null : ls.get('kt_pass', null);
+    if (saved && crypto.subtle && (await sha(saved)) === PASS_HASH) this.open(saved);
+    else this.setState({ phase: 'locked' });
+  }
+  componentWillUnmount() { [this.rot, this.tick, this.wxT, this.pollT, this.mapT, this.stT].forEach(clearInterval); this.stopWatch(); }
+  componentDidUpdate() { this.syncMap(); }
+
+  t() { return URL_NOW != null ? URL_NOW : this.state.now; }
+
+  async open(pass) {
+    ls.set('kt_pass', pass);
+    this.pass = pass;
+    this.setState({ phase: 'open', err: '' });
+    this.tick = setInterval(() => { this.setState({ now: Date.now() }); this.trackFlight(); }, 30000);
+    this.loadWx(); this.wxT = setInterval(() => this.loadWx(), 15 * 60000);
+    this.poll(); this.pollT = setInterval(() => this.poll(), 60000);
+    this.loadStatus(); this.stT = setInterval(() => this.loadStatus(), 120000);
+    this.trackFlight();
+    document.addEventListener('visibilitychange', this.onVis);
+    const who = ls.get('kt_share', null);
+    if (who) this.startShare(who);
+  }
+  onVis = () => {
+    if (document.visibilityState !== 'visible') return;
+    this.setState({ now: Date.now() }); this.poll(); this.trackFlight(); this.loadStatus();
+    if (this.state.share) { this.sendNow(); if (this.state.wake) this.reqWake(); }
+  };
+
+  async loadStatus() {
+    try { const r = await fetch('status.json?' + Date.now(), { cache: 'no-store' }); if (!r.ok) return; const j = await r.json(); if (j && j.message) this.setState({ status: j }); } catch (e) {}
+  }
+
+  async trackFlight() {
+    if (URL_NOW != null) return;
+    const c = this.segAt(Date.now());
+    if (!c || c.k !== 'flight' || !c.cs) { if (this.state.adsb) this.setState({ adsb: null }); return; }
+    if (this._trkBusy || (this._trk && Date.now() - this._trk < (this._trkOk ? 55000 : 20000))) return;
+    this._trk = Date.now(); this._trkBusy = true; this._trkOk = false;
+    const AO = u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u + '?t=' + Date.now());
+    const CT = u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u);
+    const A = 'https://api.adsb.lol/v2/callsign/' + c.cs, B = 'https://api.airplanes.live/v2/callsign/' + c.cs;
+    const srcs = (FLIGHT_PROXY ? [FLIGHT_PROXY + c.cs] : []).concat([A, B, CT(A), AO(A), CT(B), AO(B)]);
+    for (const u of srcs) {
+      try {
+        const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 8000);
+        const r = await fetch(u, { cache: 'no-store', signal: ctl.signal });
+        clearTimeout(to);
+        if (!r.ok) continue;
+        const txt = await r.text();
+        if (!/^\s*\{/.test(txt)) continue;
+        const j = JSON.parse(txt);
+        const a = (j.ac || []).find(x => x.lat != null);
+        if (Array.isArray(j.ac)) this._trkOk = true;
+        if (a) { this.setState({ adsb: { cs: c.cs, lat: a.lat, lon: a.lon, alt: a.alt_baro, gs: a.gs, track: a.track, ts: Date.now() } }); break; }
+        if (this._trkOk) break;
+      } catch (e) {}
+    }
+    this._trkBusy = false;
+  }
+
+  fileRef = React.createRef();
+  dayCardRef = React.createRef();
+  async loadAlbum() {
+    const r = ghRepo(); if (!r) return;
+    try {
+      const res = await fetch('https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '?ref=' + GH_BRANCH, { cache: 'no-store' });
+      if (res.status === 404) { ls.set('kt_album', []); this.setState({ album: [] }); return; }
+      if (!res.ok) return;
+      const list = (await res.json()).filter(f => f.type === 'file' && /\.(jpe?g|png|webp)$/i.test(f.name)).map(f => ({ name: f.name, url: f.download_url }));
+      ls.set('kt_album', list); this.setState({ album: list });
+    } catch (e) {}
+  }
+  addPhotos = () => { if (!ls.get('kt_gh', '')) { this.setState({ up: { needKey: true, keyDraft: '', items: [], msg: '' } }); return; } if (this.fileRef.current) this.fileRef.current.click(); };
+  onFiles = e => { const fs = Array.from(e.target.files || []); e.target.value = ''; if (!fs.length) return; this.setState({ up: { items: fs.map(f => ({ f, url: URL.createObjectURL(f), cap: '' })), busy: false, msg: '' } }); };
+  async shrink(f) {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(f); });
+    const sc = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * sc); cv.height = Math.round(img.naturalHeight * sc);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    return cv.toDataURL('image/jpeg', 0.82).split(',')[1];
+  }
+  upGo = async () => {
+    const up = this.state.up; if (!up || up.busy) return;
+    if (up.needKey) { const k = (up.keyDraft || '').trim(); if (!k) return; ls.set('kt_gh', k); this.setState({ up: null }); if (this.fileRef.current) this.fileRef.current.click(); return; }
+    const r = ghRepo(), key = ls.get('kt_gh', ''), who = this.state.who || 'us';
+    if (!r) { this.setState({ up: Object.assign({}, up, { msg: 'Uploading works once the site is live on GitHub Pages.', err: true }) }); return; }
+    const added = [];
+    for (let i = 0; i < up.items.length; i++) {
+      this.setState({ up: Object.assign({}, this.state.up, { busy: true, err: false, msg: 'Posting ' + (i + 1) + ' of ' + up.items.length + '…' }) });
+      try {
+        const it = up.items[i], b64 = await this.shrink(it.f);
+        const name = Date.now() + '.' + who + '.' + capEnc((it.cap || '').trim().slice(0, 80)) + '.jpg';
+        const res = await fetch('https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '/' + name, { method: 'PUT', headers: { Authorization: 'Bearer ' + key, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Trip photo from ' + who, content: b64, branch: GH_BRANCH }) });
+        if (res.status === 401 || res.status === 403 || res.status === 404) { ls.set('kt_gh', ''); this.setState({ up: Object.assign({}, this.state.up, { busy: false, err: true, msg: "The upload key didn't work. Tap + Add photos to enter it again." }) }); return; }
+        if (!res.ok) throw new Error();
+        const j = await res.json(); added.push({ name, url: (j.content && j.content.download_url) || 'data:image/jpeg;base64,' + b64 });
+      } catch (e) { this.setState({ up: Object.assign({}, this.state.up, { busy: false, err: true, msg: "Couldn't post that one. Check your signal and try again." }) }); return; }
+    }
+    this.setState(s => ({ up: null, album: (s.album || []).concat(added) }));
+    setTimeout(() => this.loadAlbum(), 5000);
+  };
+  async key() {
+    if (this._key) return this._key;
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(this.pass), 'PBKDF2', false, ['deriveKey']);
+    this._key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: new TextEncoder().encode('kt-trip-2026'), iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    return this._key;
+  }
+  async enc(obj) { const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await this.key(), new TextEncoder().encode(JSON.stringify(obj)))); const all = new Uint8Array(12 + ct.length); all.set(iv); all.set(ct, 12); return b64(all); }
+  async dec(s) { const all = unb64(s.trim()); const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: all.slice(0, 12) }, await this.key(), all.slice(12)); return JSON.parse(new TextDecoder().decode(pt)); }
+  async poll() {
+    try {
+      const txt = await (await fetch('https://ntfy.sh/' + TOPIC + '/json?poll=1&since=24h', { cache: 'no-store' })).text();
+      const msgs = txt.split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(m => m && m.event === 'message' && m.message);
+      for (let i = msgs.length - 1; i >= 0; i--) { try { const fx = await this.dec(msgs[i].message); if (fx && fx.lat != null) { this.setFix(fx); break; } } catch (e) {} }
+    } catch (e) {}
+  }
+  setFix(fx) {
+    const old = this.state.fix;
+    if (old && old.ts >= fx.ts && this.state.fixArea) return;
+    ls.set('kt_fix', fx);
+    this.setState({ fix: fx });
+    if (!old || km([old.lat, old.lon], [fx.lat, fx.lon]) > 0.5 || !this.state.fixArea) this.lookup(fx);
+  }
+  async lookup(fx) {
+    try {
+      const r = await (await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&accept-language=en&lat=' + fx.lat + '&lon=' + fx.lon)).json();
+      const a = r.address || {};
+      this.setState({ fixArea: [a.suburb || a.neighbourhood || a.quarter || a.village || a.town, a.city || a.county || a.state].filter(Boolean).filter((v, i, x) => x.indexOf(v) === i).join(', ') });
+    } catch (e) {}
+    try { const w = await (await fetch('https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code&temperature_unit=fahrenheit&latitude=' + fx.lat + '&longitude=' + fx.lon)).json(); this.setState({ fixWx: { f: w.current.temperature_2m, c: w.current.weather_code } }); } catch (e) {}
+  }
+  async loadWx() {
+    const keys = ['home', 'york', 'lax', 'tpe', 'msp', 'bkk', 'cnx', 'usm'];
+    try {
+      const url = 'https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code&temperature_unit=fahrenheit&latitude=' + keys.map(k => P[k].ll[0]).join(',') + '&longitude=' + keys.map(k => P[k].ll[1]).join(',');
+      let r = await (await fetch(url)).json(); if (!Array.isArray(r)) r = [r];
+      const wx = {}; keys.forEach((k, i) => { if (r[i] && r[i].current) wx[k] = { f: r[i].current.temperature_2m, c: r[i].current.weather_code }; });
+      this.setState({ wx });
+    } catch (e) {}
+  }
+
+  startShare(who) {
+    if (!navigator.geolocation) { this.setState({ shareErr: "This browser can't share location." }); return; }
+    this.stopWatch(); ls.set('kt_share', who);
+    this.setState({ share: who, shareErr: '' });
+    this.watch = navigator.geolocation.watchPosition(p => this.onPos(p, false), err => this.setState({ shareErr: err.code === 1 ? 'Location permission is off. Allow it for this site in your phone settings.' : "Couldn't get a location fix yet. Still trying." }), { enableHighAccuracy: true, maximumAge: 30000, timeout: 60000 });
+  }
+  stopWatch() { if (this.watch != null && navigator.geolocation) navigator.geolocation.clearWatch(this.watch); this.watch = null; }
+  async onPos(p, force) {
+    const fx = { lat: +p.coords.latitude.toFixed(5), lon: +p.coords.longitude.toFixed(5), acc: Math.round(p.coords.accuracy), ts: Date.now(), who: this.state.share };
+    const last = this.lastPub;
+    if (!force && last && Date.now() - last.ts < 120000 && km([last.lat, last.lon], [fx.lat, fx.lon]) < 0.15) return;
+    this.lastPub = fx;
+    try { const res = await fetch('https://ntfy.sh/' + TOPIC, { method: 'POST', body: await this.enc(fx) }); if (!res.ok) throw new Error(); this.setState({ lastSent: fx.ts, shareErr: '' }); this.setFix(fx); }
+    catch (e) { this.lastPub = last; this.setState({ shareErr: "Couldn't send. Will retry when signal is back." }); }
+  }
+  sendNow = () => { if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => this.onPos(p, true), () => {}, { enableHighAccuracy: true, timeout: 30000 }); };
+  stopShare = () => { this.stopWatch(); ls.set('kt_share', null); if (this.wl) { this.wl.release(); this.wl = null; } this.setState({ share: null, wake: false }); };
+  async reqWake() { try { this.wl = await navigator.wakeLock.request('screen'); } catch (e) {} }
+  toggleWake = async () => { if (this.state.wake) { if (this.wl) this.wl.release(); this.wl = null; this.setState({ wake: false }); } else { await this.reqWake(); this.setState({ wake: !!this.wl }); } };
+
+  mapRef = el => {
+    if (el === this.mapEl) return;
+    if (this.map) { this.map.remove(); this.map = null; this.me = null; }
+    this.mapEl = el;
+    if (el) this.initMap();
+  };
+  addTiles(m) {
+    const L = window.L;
+    const esri = n => 'https://server.arcgisonline.com/ArcGIS/rest/services/' + n + '/MapServer/tile/{z}/{y}/{x}';
+    const ATT = 'Tiles © Esri';
+    const phys = L.tileLayer(esri('World_Physical_Map'), { maxNativeZoom: 8, maxZoom: 8, attribution: ATT });
+    const labels = L.tileLayer(esri('Reference/World_Boundaries_and_Places'), { maxZoom: 8, attribution: ATT });
+    const street = L.tileLayer(esri('World_Street_Map'), { minZoom: 8.25, maxZoom: 19, attribution: ATT });
+    let ok = 0, sw = false;
+    phys.on('tileload', () => { ok++; });
+    phys.on('tileerror', () => { if (sw || ok) return; sw = true; [phys, labels, street].forEach(l => m.removeLayer(l)); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(m); });
+    phys.addTo(m); labels.addTo(m); street.addTo(m);
+  }
+  initMap() {
+    const el = this.mapEl;
+    if (!el) return;
+    if (!window.L) { clearTimeout(this.mapT); this.mapT = setTimeout(() => this.initMap(), 200); return; }
+    const L = window.L;
+    const m = this.map = L.map(el, { scrollWheelZoom: false, zoomSnap: 0.25, minZoom: 1.5, dragging: !L.Browser.mobile, tap: false, bounceAtZoomLimits: false });
+    if (L.Browser.mobile) { el.addEventListener('touchstart', e => { if (e.touches.length > 1) m.dragging.enable(); }, { passive: true }); el.addEventListener('touchend', e => { if (e.touches.length === 0) m.dragging.disable(); }, { passive: true }); }
+    this.addTiles(m);
+    const face = (n, ml) => '<img src="' + S(n) + '" alt="" style="width:60px;height:60px;object-fit:contain;' + (ml ? 'margin-left:-16px;' : '') + 'filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))">';
+    this.facesHtml = '<div style="display:flex;transform:translate(-50%,-62%)">' + face('r2-04-kyle-green-cap') + face('02b-tj-headshot', true) + '</div>';
+    this.me = L.marker([0, 0], { interactive: false, zIndexOffset: 1000, icon: L.divIcon({ className: '', iconSize: [0, 0], html: this.facesHtml }) }).addTo(m);
+    this.meTip = null; this.mePos = null; this.meKind = 'faces';
+    this.syncMap(true);
+    setTimeout(() => { if (this.map) { this.map.invalidateSize(); this.syncMap(true); } }, 300);
+  }
+  zoomFor(c) { return c.live ? 13 : c.k === 'flight' ? 4.5 : c.k === 'drive' ? 7 : c.k === 'airport' ? 10 : c.k === 'stay' ? (c.p === 'york' ? 11 : 12) : 10; }
+  dayMapRef = el => {
+    if (el === this.dayEl) return;
+    if (this.dayMap) { this.dayMap.remove(); this.dayMap = null; }
+    this.dayEl = el; this.dayKey = null;
+    if (el) this.initDayMap();
+  };
+  initDayMap() {
+    const el = this.dayEl;
+    if (!el) return;
+    if (!window.L) { clearTimeout(this.dayT); this.dayT = setTimeout(() => this.initDayMap(), 200); return; }
+    const L = window.L;
+    const m = this.dayMap = L.map(el, { zoomControl: false, dragging: false, touchZoom: false, doubleClickZoom: false, scrollWheelZoom: false, boxZoom: false, keyboard: false, tap: false });
+    this.addTiles(m);
+    this.dayLayer = L.layerGroup().addTo(m);
+    this.dayKey = null; this.syncDayMap(true);
+    setTimeout(() => { if (this.dayMap) { this.dayMap.invalidateSize(); this.dayKey = null; this.syncDayMap(true); } }, 300);
+  }
+  syncDayMap(instant) {
+    const i = this._dayI;
+    if (i == null || !this.dayMap || this.dayKey === i) return;
+    const prevI = this.dayKey; this.dayKey = i;
+    const L = window.L, day = DAYS[i], p = P[day.p];
+    const ll = mll(p.ll), z = p.poi || p.hotel ? 11 : 9;
+    this.dayLayer.clearLayers();
+    if (prevI != null && DAYS[prevI] && DAYS[prevI].p !== day.p) L.polyline(unwrap([mll(P[DAYS[prevI].p].ll), ll]), { color: '#E83F7A', weight: 4, dashArray: '2 9', lineCap: 'round' }).addTo(this.dayLayer);
+    const imgs = (DAY_STK[day.d] || []).map((n, j) => '<img src="' + S(n) + '" alt="" style="width:78px;height:78px;object-fit:contain;transform:' + (/plane/.test(n) && DAY_WEST[day.d] ? 'scaleX(-1) ' : '') + 'rotate(' + (j % 2 ? 6 : -6) + 'deg);filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))">').join('');
+    L.circleMarker(ll, { radius: 7, color: '#fff', weight: 3, fillColor: ACC, fillOpacity: 1, interactive: false }).addTo(this.dayLayer);
+    L.marker(ll, { interactive: false, icon: L.divIcon({ className: '', iconSize: [0, 0], html: '<div style="display:flex;gap:2px;transform:translate(-50%,-108%)">' + imgs + '</div>' }) }).addTo(this.dayLayer);
+    if (instant || prevI == null) this.dayMap.setView(ll, z, { animate: false }); else this.dayMap.flyTo(ll, z, { duration: 3.5, easeLinearity: 0.15 });
+  }
+  curView() {
+    const c = this.cur(this.t());
+    if (c.k === 'flight') return P[c.from].tz === BKK && P[c.to].tz === BKK ? 'th' : 'world';
+    if (c.k === 'airport' && (c.p === 'lax' || c.p === 'tpe')) return 'world';
+    return c.inTH ? 'th' : 'usa';
+  }
+  fit(v, anim) {
+    if (!this.map) return;
+    const B = { usa: [[25, 236], [49.5, 294]], world: [[3, 95], [58, 295]], th: [[5.6, 97.5], [20.3, 105.6]] };
+    this.map.fitBounds(B[v], { padding: [16, 16], animate: anim !== false });
+    if (this.state.view !== v) this.setState({ view: v });
+  }
+  focus(k, z) {
+    if (!this.map) return;
+    const p = P[k];
+    this.map.flyTo(mll(p.ll), z || (p.poi || p.hotel ? 12 : p.airport ? 9 : 10), { duration: 1 });
+    this.setState({ sel: k, view: null });
+  }
+  syncMap(force) {
+    if (this.dayMap) this.syncDayMap();
+    if (!this.map || !this.me) return;
+    const c = this.cur(this.t());
+    const pos = mll(c.pos);
+    const kind = c.k === 'flight' ? planeKey(c.air) + (isWest(P[c.from].ll, P[c.to].ll) ? ':w' : ':e') : 'faces';
+    if (kind !== this.meKind) {
+      this.meKind = kind;
+      const [pk, dir] = kind.split(':');
+      this.me.setIcon(window.L.divIcon({ className: '', iconSize: [0, 0], html: kind === 'faces' ? this.facesHtml : '<img src="' + S(pk + '-heads') + '" alt="" style="width:150px;height:auto;display:block;transform:translate(-50%,-55%)' + (dir === 'w' ? ' scaleX(-1)' : '') + ';filter:drop-shadow(0 4px 5px rgba(0,0,0,.3))">' }));
+    }
+    const moved = !this.mePos || Math.abs(this.mePos[0] - pos[0]) > 1e-5 || Math.abs(this.mePos[1] - pos[1]) > 1e-5;
+    if (moved || force) { const first = !this.mePos; this.me.setLatLng(pos); this.mePos = pos; if (first || force) this.map.setView(pos, this.zoomFor(c), { animate: false }); else this.map.panTo(pos); }
+    const tip = this._locLabel || '';
+    if (tip !== this.meTip) { this.meTip = tip; this.me.unbindTooltip(); if (tip) this.me.bindTooltip(tip, { permanent: true, direction: 'top', offset: [0, -50], className: 'kt-bubble' }).openTooltip(); }
+  }
+  segAt(t) { const i = SEGS.findIndex(sg => t >= sg.s && t < sg.e); return i < 0 ? null : Object.assign({}, SEGS[i], { idx: i }); }
+  cur(t) {
+    let c;
+    const sg = this.segAt(t);
+    if (t < T0) c = { k: 'before', p: 'home', pos: P.home.ll, tz: NYC };
+    else if (!sg) c = { k: 'after', p: 'home', pos: P.home.ll, tz: NYC };
+    else {
+      const f = (t - sg.s) / (sg.e - sg.s);
+      c = Object.assign({}, sg, { f });
+      if (sg.k === 'stay' || sg.k === 'airport') { c.pos = P[sg.p].ll; c.tz = P[sg.p].tz; }
+      else if (sg.k === 'homeday') { c.pos = P.york.ll; c.tz = CHI; c.p = 'york'; }
+      else if (sg.k === 'flight') {
+        c.pos = gc(P[sg.from].ll, P[sg.to].ll, f); c.tz = f < .5 ? P[sg.from].tz : P[sg.to].tz;
+        const a = this.state.adsb;
+        c.liveFlight = !!(a && a.cs === sg.cs && Date.now() - a.ts < 15 * 60000 && URL_NOW == null);
+        if (c.liveFlight) {
+          const here = [a.lat, a.lon], dest = P[sg.to].ll;
+          if (a.gs && a.track != null) {
+            const ahead = a.gs * 1.852 * ((LEAD_MIN * 60000 + (Date.now() - a.ts)) / 3600000);
+            const left = km(here, dest);
+            c.pos = ahead >= left - 20 ? gc(here, dest, Math.max(0, (left - 20) / left)) : destPt(here, a.track, ahead);
+          } else c.pos = here;
+        }
+        const lon = c.pos[1], lat = c.pos[0];
+        const region = (lon > 140 || lon < -125) && lat < 62 ? 'Over the Pacific' : lon < -60 ? 'Over the US' : inTHll(c.pos) ? 'Over Thailand' : lon > 100 && lon < 125 ? 'Over Asia' : 'In the air';
+        c.bubble = region + ', ' + dur(sg.e - t) + ' to ' + P[sg.to].city;
+      } else { c.pos = along(drivePts(sg), f); c.tz = f < .5 ? P[sg.from].tz : P[sg.to].tz; }
+    }
+    const f = this.state.fix;
+    const lf = URL_NOW == null && f && t - f.ts < 3 * 3600000 && c.k !== 'flight' ? f : null;
+    if (lf) { c.live = lf; c.pos = [lf.lat, lf.lon]; if (inTHll(c.pos)) c.tz = BKK; }
+    c.inTH = inTHll(c.pos);
+    c.place = c.p || (c.k === 'flight' || c.k === 'drive' ? c.to : 'home');
+    return c;
+  }
+  dayStatus(day, t) {
+    const over = t > day.end;
+    const items = day.items.map((it, i) => {
+      const laterDone = day.items.slice(i + 1).some(x => x.at != null && x.at <= t);
+      return { text: it.text, at: it.at, done: over || (it.at != null ? it.at <= t : laterDone) };
+    });
+    return { over, items };
+  }
+  todayIdx(t) { if (t < DAYS[0].start) return -1; return DAYS.findIndex(d => t <= d.end); }
+
+  renderVals() {
+    const st = this.state, t = this.t();
+    const GATE = STICKERS.map(n => ({ src: S(n) }));
+    const cur = st.si % GATE.length;
+    const gateSticker = React.createElement('div', { style: { width: '150px', height: '150px', transform: 'rotate(-4deg)', position: 'relative' } },
+      GATE.map((it, i) => React.createElement('img', { key: it.src, src: it.src, alt: '', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.15))', opacity: i === cur ? 1 : 0, transform: i === cur ? 'scale(1)' : 'scale(.92)', transition: 'opacity .35s ease, transform .35s ease' } })));
+    const base = {
+      locked: st.phase === 'locked', open: st.phase === 'open', pass: st.pass, err: st.err, gateSticker,
+      onPass: e => this.setState({ pass: e.target.value, err: '' }),
+      isUsRole: st.role === 'us', enterPlain: () => { this._shareAfter = null; }, enterKyle: () => { this._shareAfter = 'Kyle'; }, enterTJ: () => { this._shareAfter = 'TJ'; },
+      pickRole: !st.role, hasRole: !!st.role, roleLabel: st.role === 'us' ? 'Kyle & TJ' : 'Family', pickFam: () => this.setState({ role: 'fam', err: '' }), pickUs: () => this.setState({ role: 'us', err: '' }), backRole: () => this.setState({ role: null, pass: '', err: '' }),
+      unlock: async e => {
+        e.preventDefault();
+        if (!crypto.subtle) { this.setState({ err: 'This page needs a secure (https) connection.' }); return; }
+        const pw = st.pass.trim(), h = await sha(pw);
+        if (st.role === 'us' && h === ADMIN_HASH) {
+          try { const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']); const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: new TextEncoder().encode('kt-trip-admin'), iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']); const w = unb64(FAM_WRAP); const fam = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: w.slice(0, 12) }, k, w.slice(12))); ls.set('kt_admin', true); this.setState({ admin: true }); await this.open(fam); if (this._shareAfter) { const w = this._shareAfter; this._shareAfter = null; this.startShare(w); setTimeout(() => this.sendNow(), 400); } } catch (x) { this.setState({ err: "That's not it. Try again." }); }
+        } else if (st.role === 'fam' && h === PASS_HASH) { ls.set('kt_admin', null); this.setState({ admin: false }); this.open(pw); }
+        else this.setState({ err: "That's not it. Try again." });
+      },
+    };
+    if (st.phase !== 'open') return base;
+
+    const c = this.cur(t);
+    const locLabel = c.k === 'flight' ? (c.bubble || 'In the air') : c.live && st.fixArea ? 'Near ' + st.fixArea : c.k === 'stay' ? (c.p === 'york' ? "Grammy & Tim's, Yorkville" : P[c.p].name) : c.k === 'airport' ? P[c.p].name : c.k === 'drive' ? 'On the road to Yorkville' : c.k === 'homeday' ? 'Heading home to Milford' : 'Milford, CT';
+    this._locLabel = locLabel;
+    const wxOf = k => st.wx[(P[k] && P[k].wx) || k];
+    let wx = wxOf(c.place);
+
+    const alt = sunAlt(c.pos[0], c.pos[1], t), hr = hourOf(t, c.tz);
+    const phase = alt < -6 ? 'night' : alt < 0 ? (hr < 12 ? 'dawn' : 'dusk') : alt < 10 ? (hr < 12 ? 'morning' : 'golden') : 'day';
+    const night = phase === 'night';
+    const sky = night
+      ? { bg: '#1F2A33', ink: '#F4F1EA', muted: '#B8C2CF', tile: 'rgba(255,255,255,.08)', accent: 'oklch(0.82 0.1 85)' }
+      : { bg: 'radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4)', ink: '#2E2117', muted: '#5E4B3A', tile: '#F7EEDF', accent: '#7A4B26' };
+    const IMG = (...urls) => urls.map(u => 'url("' + u + '") center/cover no-repeat').join(', ');
+    const CLOUD = (x, y, w, h, a) => 'radial-gradient(' + w + ' ' + h + ' at ' + x + ' ' + y + ', rgba(255,255,255,' + a + ') 0%, rgba(255,255,255,' + (a * .6) + ') 45%, rgba(255,255,255,0) 72%)';
+    const clouds = [CLOUD('12%', '30%', '28%', '16%', .95), CLOUD('30%', '24%', '22%', '13%', .9), CLOUD('70%', '40%', '32%', '18%', .95), CLOUD('88%', '28%', '20%', '12%', .85), CLOUD('48%', '62%', '36%', '16%', .8), CLOUD('8%', '72%', '26%', '12%', .7), CLOUD('92%', '70%', '24%', '12%', .75)].join(', ');
+    const stars = ['8% 20%', '22% 12%', '35% 30%', '52% 10%', '66% 24%', '80% 14%', '92% 34%', '15% 44%', '58% 40%', '75% 52%'].map(p => 'radial-gradient(2px 2px at ' + p + ', #fff 50%, transparent 51%)').join(', ');
+    const sceneKey = c.k === 'flight' ? 'air'
+      : c.k === 'drive' || c.k === 'homeday' || c.k === 'before' || c.k === 'after' ? 'road'
+      : ({ usm: 'samui', usma: 'samui', cnx: 'chiangmai', cnxa: 'chiangmai', bkk: 'bangkok', bkka: 'bangkok', york: 'york', ord: 'chicago', msp: 'chicago', lax: 'la', tpe: 'taipei' })[c.p] || 'road';
+    const PAGE = {};
+    const pageBase = PAGE[sceneKey] || '#2E9E5B', patKey = sceneKey === 'chicago' ? 'york' : sceneKey;
+    const page = { bg: 'url("assets/patterns/' + patKey + '.png") 280px 280px/560px 560px repeat, url("assets/patterns/flowers.png") 0 0/560px 560px repeat, ' + pageBase };
+    const SCENES = {
+      air: night ? stars + ', ' + clouds.replace(/255,255,255/g, '190,200,225') + ', linear-gradient(180deg, #101A33 0%, #22335A 60%, #3B4C78 100%)' : clouds + ', linear-gradient(180deg, #3E8FD0 0%, #7DBDEA 55%, #CFE8F7 100%)',
+      samui: IMG('assets/scenes/koh-samui.jpg', PH('conrad.jpg')) + ', #2E7D6B',
+      chiangmai: IMG('assets/scenes/chiang-mai.jpg', PH('aleenta.jpg')) + ', #5A4630',
+      bangkok: IMG('assets/scenes/bangkok.jpg', PH('waldorf.jpg')) + ', #1E2A44',
+      york: IMG('assets/scenes/yorkville.jpg', PH('yorkville.jpg')) + ', #6E8B4E',
+      chicago: IMG('assets/scenes/chicago.jpg') + ', linear-gradient(180deg, #E9A86B 0%, #F3D3A8 100%)',
+      la: IMG('assets/scenes/los-angeles.jpg') + ', linear-gradient(180deg, #F08A5D 0%, #F7C48B 60%, #FBE3C0 100%)',
+      taipei: IMG('assets/scenes/taipei.jpg') + ', linear-gradient(180deg, #6B5B95 0%, #C97B84 60%, #F2C6A0 100%)',
+      road: IMG('assets/scenes/road-trip.jpg') + ', linear-gradient(180deg, #D9893F 0%, #E9B872 55%, #F3DDB0 100%)',
+    };
+    const scrim = 'linear-gradient(180deg, rgba(20,28,36,.18) 0%, rgba(20,28,36,0) 35%)' + (night && sceneKey !== 'air' ? ', linear-gradient(rgba(14,22,44,.5), rgba(14,22,44,.5))' : '');
+    const LBL = { samui: 'Koh Samui', chiangmai: 'Chiang Mai', bangkok: 'Bangkok', york: 'Yorkville, Illinois', chicago: 'Chicago', la: "Kyle's old stomping grounds", taipei: 'Taipei' };
+    const scene = { bg: scrim + ', ' + SCENES[sceneKey],
+      kicker: '',
+      label: 'Kyle & TJ ' + (c.k === 'flight' ? (c.tbd ? 'are flying to Bangkok' : 'are on ' + c.air + ' ' + c.num.split(' ')[1] + ' to ' + P[c.to].city)
+        : c.k === 'drive' ? 'are on the road to Yorkville' : c.k === 'homeday' ? 'are heading home to Milford' : c.k === 'before' ? 'are getting ready to go' : c.k === 'after' ? 'are home in Milford'
+        : c.k === 'stay' ? (c.p === 'york' ? "are at Grammy & Tim's" : c.p === 'usm' ? 'are on Koh Samui' : 'are in ' + P[c.p].city)
+        : c.k === 'airport' ? (c.p === 'ord' ? "are at O'Hare" : c.p === 'msp' ? 'are in Minneapolis' : 'are in ' + P[c.p].city) : 'are on their way') };
+    const ourTime = tm(t, c.tz);
+    const skyLine = c.k === 'flight' ? (phase === 'night' ? "Dark outside the window. We're trying to sleep somewhere above the clouds." : 'Sunshine above the clouds. Window shades up.')
+      : phase === 'night' ? (hr >= 21 || hr < 1 ? "It's " + ourTime + " here. Winding down for the night." : "It's " + ourTime + " here. We're asleep, probably dreaming about mango sticky rice.")
+      : phase === 'dawn' ? 'The sun is just coming up for us.'
+      : phase === 'morning' ? 'Good morning from our side of the world.'
+      : phase === 'golden' ? 'Golden hour here. Best light of the day.'
+      : phase === 'dusk' ? 'The sun is going down for us.' : 'Broad daylight here.';
+
+    const tr = { showProgress: false, pct: 0, badge: '', badgeBg: GO };
+    if (c.k === 'before') {
+      Object.assign(tr, { eyebrow: 'Countdown', head: 'Leaving in ' + dur(T0 - t), sub: "First stop is Grammy & Tim's in Yorkville, with Kona and Rio riding along." });
+    } else if (c.k === 'after') {
+      Object.assign(tr, { eyebrow: 'Trip complete', head: 'Home safe!', sub: 'Back in Milford with Kona and Rio. Thanks for following along.' });
+    } else if (c.k === 'homeday') {
+      Object.assign(tr, { eyebrow: 'Travel day', head: 'Heading home to CT today', sub: 'Kona and Rio are riding along back to Milford.' });
+    } else if (c.k === 'drive') {
+      Object.assign(tr, { eyebrow: 'On the road', head: 'Driving to Yorkville', sub: 'Straight through in one day, with Kona and Rio in the back of the Jeep.', showProgress: true, pct: Math.round(c.f * 100), fromLabel: 'Milford', toLabel: 'Yorkville', pctLabel: dur(c.e - t) + ' to go' });
+    } else if (c.k === 'flight') {
+      const a = P[c.from], b = P[c.to];
+      Object.assign(tr, c.tbd
+        ? { eyebrow: 'Travel day', head: 'Flying to Bangkok', sub: 'Chiang Mai to Bangkok. Flight details coming soon.' }
+        : { eyebrow: 'In the air', head: c.air + ' ' + c.num.split(' ')[1] + ' to ' + b.city, sub: a.city + ' to ' + b.city + '. Lands at ' + tm(c.e, b.tz) + ' local time, in ' + dur(c.e - t) + '.' + (c.liveFlight ? (st.adsb.alt ? ' Cruising at ' + Number(st.adsb.alt).toLocaleString('en-US') + ' ft' + (st.adsb.gs ? ', ' + Math.round(st.adsb.gs * 1.15078) + ' mph' : '') + '.' : '') : (/Pacific/.test(c.bubble) ? " There are no trackers over the open Pacific, so this position is estimated from the schedule." : '')),
+            badge: c.liveFlight ? 'Live' : 'Estimated', badgeBg: c.liveFlight ? GO : '#6B7580' });
+      Object.assign(tr, { showProgress: true, pct: Math.round(c.f * 100), fromLabel: a.code, toLabel: b.code, pctLabel: dur(c.e - t) + ' left' });
+      wx = wxOf(c.to);
+    } else if (c.k === 'airport') {
+      const nx = SEGS[c.idx + 1];
+      const p = P[c.p];
+      const layover = ['lax', 'tpe', 'msp'].includes(c.p) || (c.p === 'bkka' && SEGS[c.idx - 1] && SEGS[c.idx - 1].k === 'flight');
+      Object.assign(tr, { eyebrow: layover ? 'Layover' : 'At the airport', head: (layover ? 'Layover in ' : 'At ') + (layover ? p.city : p.name), sub: nx && nx.k === 'flight' ? (nx.num ? nx.air + ' ' + nx.num.split(' ')[1] : 'Our flight') + ' to ' + P[nx.to].city + ' leaves at ' + tm(nx.s, p.tz) + ', in ' + dur(nx.s - t) + '.' : 'Heading out soon.' });
+    } else {
+      const p = P[c.p], n = Math.floor((t - c.s) / 86400000) + 1, tot = Math.max(1, Math.round((c.e - c.s) / 86400000));
+      Object.assign(tr, c.p === 'york'
+        ? { eyebrow: 'Right now', head: "At Grammy & Tim's", sub: t > Date.parse('2026-10-30T00:00-05:00') ? 'Back in Yorkville with Kona and Rio!' : 'Family time in Yorkville. Kona and Rio are settling in.' }
+        : { eyebrow: 'Right now', head: (c.p === 'usm' ? 'On ' : 'In ') + p.place, sub: 'Day ' + (Math.floor((t - Date.parse(new Date(c.s).toLocaleDateString('en-CA', { timeZone: p.tz }) + 'T00:00:00+07:00')) / 86400000) + 1) + ' at the ' + p.name + '.' });
+    }
+    if (c.live) {
+      tr.eyebrow = 'Live from ' + (c.live.who || 'our') + "'s phone · " + ago(st.now - c.live.ts);
+      if (st.fixArea) tr.sub += ' Last seen near ' + st.fixArea + '.';
+      if (st.fixWx) wx = st.fixWx;
+    }
+    const rel = (tz, name) => { const d = Math.round((tzOff(c.tz, t) - tzOff(tz, t)) * 10) / 10; return d === 0 ? 'same time as ' + name : Math.abs(d) + (Math.abs(d) === 1 ? ' hr ' : ' hrs ') + (d > 0 ? 'ahead of ' : 'behind ') + name; };
+    Object.assign(tr, {
+      zone: ZL[c.tz] || c.tz, ourTime, ourDay: dy(t, c.tz),
+      compare: "We're " + rel(CHI, 'Chicago') + ' and ' + rel(NYC, 'New England') + '.',
+      skyLine,
+    });
+
+    const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
+      : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
+    const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
+    const nowSticker = React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
+
+    const ti = this.todayIdx(t);
+    const todayDay = ti >= 0 ? DAYS[ti] : null;
+    const NX_POS = [{ l: '-34%', t: '62%', w: '50%', r: '-10deg' }, { l: '70%', t: '-16%', w: '42%', r: '12deg' }, { l: '76%', t: '74%', w: '38%', r: '-6deg' }];
+    const nowExtras = [...new Set((todayDay ? DAY_STK[todayDay.d] || [] : []).concat([art[1]]))].filter(n => n && n !== art[0]).slice(0, 3).map((n, i) => Object.assign({ src: S(n) }, NX_POS[i]));
+    let today = { title: '', items: [], count: '' };
+    if (todayDay) {
+      const ds = this.dayStatus(todayDay, t);
+      const nextI = ds.items.findIndex(x => !x.done && x.at != null);
+      const firstOpen = ds.items.findIndex(x => !x.done);
+      today = { title: todayDay.title, count: ds.items.filter(x => x.done).length + ' of ' + ds.items.length + ' done',
+        items: ds.items.map((x, i) => {
+          const isNext = i === nextI && x.at != null;
+          return { text: x.text, mark: x.done ? '✓' : '', fill: x.done ? GO : 'transparent', ring: phase === 'night' ? '#8C97A5' : '#9AA3AC', op: 1, weight: 500, bg: 'transparent', isNext, inText: isNext ? 'in ' + dur(x.at - t) : '' };
+        }) };
+    }
+
+    const hmOf = tz => { const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(t); const g = k => +((p.find(x => x.type === k) || {}).value) || 0; const h = g('hour') % 24, m = g('minute'); return { hDeg: (h % 12) * 30 + m * 0.5, mDeg: m * 6 }; };
+    const clocks = [
+      Object.assign({ label: 'TJ & Kyle', big: tm(t, c.tz), small: fmt(t, c.tz, { weekday: 'short' }), rim: '#B5452F' }, hmOf(c.tz)),
+      Object.assign({ label: 'Chicago', big: tm(t, CHI), small: fmt(t, CHI, { weekday: 'short' }), rim: '#5C3D24' }, hmOf(CHI)),
+      Object.assign({ label: 'New England', big: tm(t, NYC), small: fmt(t, NYC, { weekday: 'short' }), rim: '#5C3D24' }, hmOf(NYC)),
+    ].map(k => Object.assign(k, { ink: sky.ink, sub: sky.muted, labelInk: sky.accent }));
+
+    const stayRanges = k => SEGS.filter(sg => sg.k === 'stay' && sg.p === k).map(sg => md(sg.s, P[k].tz) + ' to ' + md(sg.e, P[k].tz)).join(' · ');
+    const selKey = st.sel || c.place;
+    const sp = P[selKey] || P.home;
+    const sel = {
+      hasPhoto: !!sp.photo, photo: sp.photo || '', name: sp.name, place: sp.airport ? sp.code + ' · ' + sp.city : sp.place,
+      blurb: sp.blurb || (sp.airport ? 'Connecting through ' + sp.city + '.' : ''),
+      dates: sp.dates || (selKey === 'home' ? 'Left Oct 13 · Back Nov 1' : sp.airport ? 'Airport stop' : stayRanges(selKey)),
+      time: tm(t, sp.tz), weather: wxStr(wxOf(selKey)), url: sp.url || '', maps: mapsUrl(sp), wxUrl: wxUrl(sp.city),
+    };
+
+    const days = DAYS.map((day, i) => {
+      const ds = this.dayStatus(day, t);
+      const isToday = i === ti;
+      const dt = Date.parse(day.d + 'T12:00:00Z');
+      const nextI = isToday ? ds.items.findIndex(x => !x.done && x.at != null) : -1;
+      return {
+        anchor: isToday ? 'today' : 'd-' + day.d, isToday, done: ds.over, stamp: day.stamp || 'Done', stampPad: ds.over ? '96px' : '0px', star: !!day.star,
+        where: day.where, title: day.title, wd: fmt(dt, 'UTC', { weekday: 'short' }), dd: fmt(dt, 'UTC', { day: 'numeric' }), mon: fmt(dt, 'UTC', { month: 'short' }),
+        border: isToday ? ACC : day.star ? 'oklch(0.85 0.09 85)' : 'transparent', chip: isToday ? ACC : '#F4E9D6', chipInk: isToday ? '#fff' : '#1F2A33', opacity: ds.over ? .62 : 1,
+        items: ds.items.map((x, j) => ({ text: x.text, mark: x.done ? '✓' : '', fill: x.done ? GO : 'transparent', ring: '#C9C0AE', ink: '#1F2A33', weight: j === nextI ? 800 : 500 })),
+        stickers: (DAY_STK[day.d] || []).map((n, j) => ({ src: S(n), rot: (j % 2 ? 6 : -6) + 'deg' })),
+      };
+    });
+    const dayI = st.dayIdx != null ? st.dayIdx : Math.max(0, ti);
+    this._dayI = dayI;
+    const goDay = (i, jump) => { this.setState({ dayIdx: Math.max(0, Math.min(DAYS.length - 1, i)) }); if (jump) setTimeout(() => { const el = this.dayCardRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 130, behavior: 'smooth' }); }, 60); };
+    const dc = Object.assign({}, days[dayI], { num: dayI + 1, total: DAYS.length, dateLabel: fmt(Date.parse(DAYS[dayI].d + 'T12:00:00Z'), 'UTC', { weekday: 'long', month: 'long', day: 'numeric' }), prevOp: dayI > 0 ? 1 : .3, nextOp: dayI < DAYS.length - 1 ? 1 : .3 });
+    let mi = 0;
+    for (const sg of SEGS) { if (!sg.from || !sg.to || !P[sg.from] || !P[sg.to] || t <= sg.s) continue; const f = Math.min(1, (t - sg.s) / (sg.e - sg.s)); mi += km(P[sg.from].ll, P[sg.to].ll) * 0.621371 * (sg.k === 'drive' ? 1.2 : 1) * f; }
+    const miStr = String(Math.round(mi)).padStart(5, '0');
+    const miles = { digits: miStr.split(''), label: Math.round(mi).toLocaleString() + ' miles traveled so far' };
+    const d0 = Date.parse(DAYS[0].d + 'T12:00:00Z'), pad0 = new Date(d0).getUTCDay();
+    const cal = [];
+    for (let k = 0; k < pad0; k++) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
+    days.forEach((d, i) => { const isT = i === ti, sel = st.dayIdx != null && i === dayI; cal.push({ empty: false, num: d.dd, label: d.wd + ' ' + d.mon + ' ' + d.dd, go: () => goDay(i, true), stk: d.stickers && d.stickers[0] ? d.stickers[0].src : '', stkOp: d.done && !isT ? .55 : 1, shadow: sel ? '0 4px 12px rgba(46,33,23,.25)' : 'none',
+      bg: isT ? '#5C3D24' : d.done ? '#E2CDA8' : '#FBF3E4', ink: isT ? '#FBF3E4' : d.done ? '#6B5643' : '#2E2117', ring: sel ? '#B5452F' : isT ? '#5C3D24' : '#E2CDA8',
+      mark: isT ? 'Today' : d.done ? '✓' : d.star ? '★' : d.dd === '1' ? d.mon : '', markInk: isT ? '#E2BF6E' : '#7A4B26' }); });
+    while (cal.length % 7) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
+    const dots = days.map((d, i) => ({ bg: i === dayI ? '#1F2A33' : d.done ? GO : i === ti ? ACC : '#D6CCBA', w: i === dayI ? '20px' : '8px', go: () => goDay(i), label: 'Day ' + (i + 1) }));
+    const AV = ['#B5452F', '#7A4B26', '#8C6A1F', '#5C3D24', '#9A4A3A'];
+    const families = FAMILIES.map((f, fi) => ({ title: f.title, face: S(f.face), tint: f.tint, open: !!(st.famOpen || {})[fi], chev: (st.famOpen || {})[fi] ? 'Hide ▴' : 'Contact info ▾', toggle: () => this.setState(z => ({ famOpen: Object.assign({}, z.famOpen, { [fi]: !(z.famOpen || {})[fi] }) })), people: f.people.map(([name, rel, n], i) => ({ name, rel: rel.replace(/[()]/g, ''), initial: name[0], avBg: AV[(i + fi * 2) % AV.length], tel: 'tel:+1' + n, sms: 'sms:+1' + n, num: n.slice(0, 3) + '-' + n.slice(3, 6) + '-' + n.slice(6) })) }));
+    const tripPct = Math.max(0, Math.min(100, Math.round((t - T0) / (DAYS[DAYS.length - 1].end - T0) * 100)));
+    const tripLabel = t < T0 ? 'Trip starts Oct 13' : ti < 0 ? 'All 20 days done!' : 'Day ' + (ti + 1) + ' of ' + DAYS.length;
+
+    const showRet = t >= RETURN_T;
+    const flSegs = SEGS.filter(sg => sg.k === 'flight');
+    const flights = flSegs.filter(sg => t < sg.e).map(sg => {
+      const a = P[sg.from], b = P[sg.to], flying = t >= sg.s && t < sg.e, soon = !flying && !sg.tbd && sg.s - t < 3 * 3600000;
+      const pk = sg.tbd || /Bangkok Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+      return { sticker: S(pk), flip: isWest(a.ll, b.ll) ? 'scaleX(-1)' : 'none', route: a.city + ' → ' + b.city, title: sg.tbd ? 'Details coming soon' : sg.air + ' ' + sg.num.split(' ')[1], when: sg.tbd ? 'Mon, Oct 26' : dy(sg.s, a.tz) + ' · ' + tm(sg.s, a.tz),
+        flying, pct: flying ? Math.round((t - sg.s) / (sg.e - sg.s) * 100) : 0,
+        status: flying ? 'In the air' : soon ? 'Soon' : sg.tbd ? 'TBD' : 'Track ↗', statusBg: flying ? 'oklch(0.58 0.11 225)' : soon ? 'oklch(0.9 0.08 75)' : '#F4E9D6', statusInk: flying ? '#fff' : '#1F2A33',
+        border: flying ? 'oklch(0.58 0.11 225)' : 'transparent', fa: sg.cs ? 'https://www.flightaware.com/live/flight/' + sg.cs : '#flights' };
+    });
+
+    const mkStay = k => {
+      const p = P[k], here = (c.k === 'stay' && c.p === k);
+      const nights = SEGS.filter(sg => sg.k === 'stay' && sg.p === k).reduce((n, sg) => n + Math.round((sg.e - sg.s) / 86400000), 0);
+      const facts = p.hotel ? [p.room + ' · ' + nights + ' nights', p.cin, p.cout, 'Daily breakfast for two', tm(t, p.tz) + ' there · ' + wxStr(wxOf(k))] : [tm(t, p.tz) + ' there · ' + wxStr(wxOf(k))];
+      return { key: k, name: p.name, photo: p.photo || '', hasPhoto: !!p.photo, noPhoto: !p.photo, sticker: S(p.sticker), dates: stayRanges(k), blurb: p.blurb, facts, url: p.url || '', tel: p.tel ? 'tel:' + p.tel : '', maps: mapsUrl(p), wxUrl: wxUrl(p.city), here, border: here ? ACC : 'transparent', canCopy: !!p.address,
+        copyLabel: st.copied === k ? 'Copied' : 'Copy address',
+        copy: () => { const txt = p.name + ', ' + p.address; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).catch(() => {}); this.setState({ copied: k }); setTimeout(() => this.setState({ copied: null }), 2000); } };
+    };
+    const nextStay = c.k === 'stay' ? c.p : (SEGS.find(sg => sg.k === 'stay' && sg.e > t) || {}).p;
+    const allStays = !!st.allStays, stays = ['usm', 'cnx', 'bkk'].map(mkStay).filter(x => allStays || x.key === nextStay), grammy = mkStay('york'), showGrammy = allStays || nextStay === 'york';
+
+    let done = 0, total = 0;
+    const bucket = BUCKET.map(g => ({ title: g.title, items: g.items.map(([id, name, where, stk]) => {
+      const on = !!st.checked[id]; total++; if (on) done++;
+      return { name, where, sticker: stk ? S(stk) : '', mark: on ? '✓' : '', boxBg: on ? GO : '#fff', boxBorder: on ? GO : '#D6CCBA', deco: on ? 'line-through' : 'none', ink: on ? '#5E6770' : '#1F2A33',
+        toggle: () => this.setState(s => { const ch = Object.assign({}, s.checked, { [id]: !s.checked[id] }); ls.set('kt_bucket', ch); return { checked: ch }; }) };
+    }) }));
+
+    const album = (st.album || []).map(parsePhoto).sort((x, y) => y.ts - x.ts);
+    const photos = album.map((p, i) => { let h = 0; for (const ch of p.name) h = (h * 31 + ch.charCodeAt(0)) | 0; return { src: p.url, cap: p.cap, rot: ((Math.abs(h) % 7) - 3) * 0.8 + 'deg', meta: [p.ts ? fmt(p.ts, VISITOR_TZ, { month: 'short', day: 'numeric' }) : '', p.who === 'kyle' ? 'Kyle' : p.who === 'tj' ? 'TJ' : ''].filter(Boolean).join(' · '), open: () => this.setState({ lb: i }) }; });
+    const upS = st.up, setWho = w => () => { ls.set('kt_who', w); this.setState({ who: w }); };
+    const upV = upS ? { needKey: !!upS.needKey, keyDraft: upS.keyDraft || '', hasItems: !upS.needKey && upS.items.length > 0, busy: !!upS.busy, msg: upS.msg || '', msgInk: upS.err ? 'oklch(0.5 0.17 25)' : '#5A4F57',
+      title: upS.items.length === 1 ? 'Add a caption' : 'Add captions', goLabel: upS.needKey ? 'Save key' : upS.busy ? 'Posting…' : 'Post ' + (upS.items.length === 1 ? 'photo' : upS.items.length + ' photos'), goOp: upS.busy ? .6 : 1,
+      kyleBg: st.who === 'kyle' ? '#1F2A33' : '#FFFFFF', kyleInk: st.who === 'kyle' ? '#FFFFFF' : '#1F2A33', tjBg: st.who === 'tj' ? '#1F2A33' : '#FFFFFF', tjInk: st.who === 'tj' ? '#FFFFFF' : '#1F2A33',
+      items: upS.items.map((it, i) => ({ url: it.url, cap: it.cap, setCap: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { items: z.up.items.map((x, j) => j === i ? Object.assign({}, x, { cap: v }) : x) }) })); } })) }
+      : { needKey: false, keyDraft: '', hasItems: false, busy: false, msg: '', msgInk: '', title: '', goLabel: '', goOp: 1, kyleBg: '', kyleInk: '', tjBg: '', tjInk: '', items: [] };
+    const lbi = st.lb;
+    const step = d => e => { e.stopPropagation(); this.setState(s => ({ lb: (s.lb + d + photos.length) % photos.length })); };
+
+    const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    const ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
+    const showInstall = !standalone && !st.installed && !st.installHidden && !ls.get('kt_install_hide', false) && (st.canPrompt || ios || /Android/.test(ua));
+
+    const v = st.view, on = k => v === k, share = st.share;
+    const fresh = !!c.live || !!c.liveFlight;
+    return Object.assign(base, {
+      showInstall, canPrompt: !!st.canPrompt,
+      installText: st.canPrompt ? 'It opens full screen, like an app, and loads even when the signal is bad.' : ios ? (/CriOS|FxiOS|EdgiOS/.test(ua) ? "Tap the Share button, then Add to Home Screen. Use Safari if you don't see it." : 'In Safari, tap the Share button, then Add to Home Screen.') : 'Open your browser menu (⋮) and tap Install app or Add to Home screen.',
+      doInstall: async () => { if (!this.bip) return; this.bip.prompt(); try { await this.bip.userChoice; } catch (e) {} this.bip = null; this.setState({ canPrompt: false }); },
+      hideInstall: () => { ls.set('kt_install_hide', true); this.setState({ installHidden: true }); },
+      trk: Object.assign(tr, { showEyebrow: !!tr.eyebrow && tr.eyebrow !== 'Right now' }), sky, scene, nowSticker, nowExtras, clocks,
+      hasAgenda: today.items.length > 0, today,
+      hasStatus: !!(st.status && st.status.message), status: st.status ? { message: st.status.message, ago: st.status.updated ? ago(Date.now() - Date.parse(st.status.updated)) : 'recently' } : { message: '', ago: '' },
+      liveLabel: URL_NOW != null ? 'Preview' : fresh ? 'Live' : 'On schedule',
+      liveColor: URL_NOW != null ? AMB : fresh ? GO : SEA,
+      sharing: !!share, notSharing: !share,
+      shareDot: share ? GO : '#C9C0AE',
+      shareTitle: share ? 'Sharing live location as ' + share : 'Live location (for TJ & Kyle)',
+      shareText: st.shareErr || (share
+        ? (st.lastSent ? 'Last sent ' + ago(st.now - st.lastSent) + '. ' : 'Getting your first fix… ') + 'It updates while this page is open on your phone. Phones pause location when the screen locks, so open the page now and then, or tap Keep screen on.'
+        : (st.fix ? 'Last check-in from ' + (st.fix.who || 'us') + ' ' + ago(st.now - st.fix.ts) + '. ' : '') + "Turn this on to put your phone's real location on the map. It's encrypted with the site password."),
+      canWake: 'wakeLock' in navigator, wakeLabel: st.wake ? 'Screen stays on ✓' : 'Keep screen on',
+      shareKyle: () => this.startShare('Kyle'), shareTJ: () => this.startShare('TJ'),
+      sendNow: this.sendNow, stopShare: this.stopShare, toggleWake: this.toggleWake,
+      mapRef: this.mapRef,
+      vb: { usa: on('usa') ? '#1F2A33' : '#FFFFFF', world: on('world') ? '#1F2A33' : '#FFFFFF', th: on('th') ? '#1F2A33' : '#FFFFFF' },
+      vc: { usa: on('usa') ? '#FFFFFF' : '#1F2A33', world: on('world') ? '#FFFFFF' : '#1F2A33', th: on('th') ? '#FFFFFF' : '#1F2A33' },
+      viewUSA: () => this.fit('usa'), viewWorld: () => this.fit('world'), viewTH: () => this.fit('th'),
+      findUs: () => { if (!this.map) return; this.map.flyTo(mll(c.pos), c.k === 'flight' ? 4 : c.live ? 14 : 11, { duration: 1 }); this.setState({ view: null, sel: null }); },
+      locLabel, dayMapRef: this.dayMapRef, showReturn: showRet, page, isAdmin: !!st.admin, families, dc, dots, cal, miles, nav: Object.fromEntries(NAV_IDS.map(id => [id, { bg: (st.navOn || 'now') === id ? '#5C3D24' : 'transparent', ink: (st.navOn || 'now') === id ? '#F7EEDF' : '#5C3D24', go: () => this.setState({ navOn: id }) }])), calMonth: st.dayIdx != null && DAYS[dayI].d.slice(5, 7) === '11' ? 'November 2026' : 'October 2026', dayShown: st.dayIdx != null, dayClose: () => this.setState({ dayIdx: null }), dayCardRef: this.dayCardRef, calOpen: !!st.calOpen, openCal: () => this.setState({ calOpen: true }), closeCal: () => this.setState({ calOpen: false }), stop: e => e.stopPropagation(), dayPrev: () => goDay(dayI - 1), dayNext: () => goDay(dayI + 1), dayToday: () => this.setState({ dayIdx: null }), notOnToday: ti >= 0 && dayI !== ti,
+      dayTS: e => { this._tx = e.touches[0].clientX; }, dayTE: e => { const dx = e.changedTouches[0].clientX - (this._tx || 0); if (Math.abs(dx) > 50) goDay(dayI + (dx < 0 ? 1 : -1)); },
+      sel, days, hasToday: ti >= 0, tripPct, tripLabel, flights, flightsDone: flights.length ? flights.length + ' to go' : 'All done!',
+      flTop: (() => { const top = []; const f = flights.findIndex(x => x.flying); if (f >= 0) top.push(Object.assign({}, flights[f], { tag: 'Right now' })); const n = flights.findIndex((x, k) => !x.flying && k > f); if (n >= 0) top.push(Object.assign({}, flights[n], { tag: 'Up next' })); return top; })(),
+      flRest: (() => { const f = flights.findIndex(x => x.flying); const n = flights.findIndex((x, k) => !x.flying && k > f); return flights.filter((x, k) => k !== f && k !== n).map(x => Object.assign({}, x, { tag: '' })); })(),
+      hasRest: flights.length > 2 || (flights.length === 2 && !flights.some(x => x.flying)), showRest: !!st.showFl, toggleFl: () => this.setState(z => ({ showFl: !z.showFl })),
+      restLabel: st.showFl ? 'Hide other flights' : 'Show the other flights', stays, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
+      lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap } : { src: '', cap: '' },
+      hasPhotos: photos.length > 0, noPhotos: photos.length === 0, fileRef: this.fileRef, addPhotos: this.addPhotos, onFiles: this.onFiles, upOpen: !!upS, up: upV, upGo: this.upGo, closeUp: () => this.setState({ up: null }), whoKyle: setWho('kyle'), whoTJ: setWho('tj'),
+      setKeyDraft: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { keyDraft: v }) })); },
+      closeLb: () => this.setState({ lb: null }), lbPrev: step(-1), lbNext: step(1),
+      lock: () => { ls.set('kt_pass', null); ls.set('kt_share', null); this.stopShare(); location.reload(); },
+    });
+  }
+}
+</script>
+</body>
+</html>
