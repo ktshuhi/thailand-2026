@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="./sky.js"></script>
 </head>
 <body>
 <x-dc>
@@ -139,7 +140,8 @@ nav::-webkit-scrollbar{display:none}
     <div style="display:flex;flex-wrap:wrap;gap:24px 20px;align-items:stretch">
     <section id="now" data-screen-label="Now" style="scroll-margin-top:140px;flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:12px">
       <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Right now</h2>
-      <div style="background:{{ sky.bg }};color:{{ sky.ink }};border-radius:26px;padding:18px 16px;box-shadow:0 0 0 2px #CDB28A,0 16px 40px rgba(31,42,51,.10);display:flex;flex-direction:column;gap:16px;transition:background 1.2s ease">
+      <div style="position:relative;isolation:isolate;background:{{ sky.bg }};color:{{ sky.ink }};text-shadow:{{ sky.shadow }};border-radius:26px;padding:18px 16px;box-shadow:0 0 0 2px #CDB28A,0 16px 40px rgba(31,42,51,.10);display:flex;flex-direction:column;gap:16px;transition:background 1.2s ease,color 1.2s ease">
+        <div ref="{{ skyRef }}" aria-hidden="true" style="position:absolute;inset:0;z-index:-1;border-radius:26px;overflow:hidden;pointer-events:none"></div>
         <div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between">
           <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -149,7 +151,7 @@ nav::-webkit-scrollbar{display:none}
             </div>
             <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.04;letter-spacing:-.02em;text-wrap:balance">{{ trk.head }}</div>
             <div style="font-size:16px;line-height:1.45;color:{{ sky.muted }};text-wrap:pretty">{{ trk.sub }}</div>
-            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px"><sc-if value="{{ trk.hasWx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;background:{{ sky.tile }};border-radius:999px;height:34px;padding:0 12px 0 4px;max-width:100%;min-width:0"><img src="{{ trk.wxIcon }}" alt="" width="30" height="30" style="width:30px;height:30px;display:block;flex:none"><span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.wxLine }}</span></div></sc-if></div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px"><sc-if value="{{ trk.hasWx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};transition:background 1.2s ease,color 1.2s ease;border-radius:999px;height:34px;padding:0 12px 0 4px;max-width:100%;min-width:0"><img src="{{ trk.wxIcon }}" alt="" width="30" height="30" style="width:30px;height:30px;display:block;flex:none"><span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.wxLine }}</span></div></sc-if></div>
           </div>
           <div style="position:relative;width:clamp(72px,20vw,104px);height:clamp(72px,20vw,104px);flex:none;margin:6px 6px 0 0">{{ nowSticker }}
             <sc-for list="{{ nowExtras }}" as="nx" hint-placeholder-count="0"><img src="{{ nx.src }}" alt="" style="position:absolute;left:{{ nx.l }};top:{{ nx.t }};width:{{ nx.w }};height:{{ nx.w }};object-fit:contain;transform:rotate({{ nx.r }});filter:drop-shadow(0 3px 4px rgba(0,0,0,.18));pointer-events:none"></sc-for>
@@ -188,9 +190,9 @@ nav::-webkit-scrollbar{display:none}
         </div>
 
         <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ false }}">
-          <div style="background:{{ sky.tile }};border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+          <div style="background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};transition:background 1.2s ease,color 1.2s ease;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:4px">
-              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.muted }}">On the agenda today · {{ today.title }}</div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.pillMuted }}">On the agenda today · {{ today.title }}</div>
             </div>
             <sc-for list="{{ today.items }}" as="ai" hint-placeholder-count="3">
               <div style="display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:7px 8px;margin:0 -8px;border-radius:12px;background:{{ ai.bg }}">
@@ -443,6 +445,7 @@ nav::-webkit-scrollbar{display:none}
       <button type="button" onClick="{{ signOut }}" style="min-height:44px;border:0;border-radius:999px;background:transparent;color:#9A7350;font:700 14px Figtree,sans-serif;cursor:pointer;padding:0 14px" style-hover="background:#F4E9D6;color:#5C3D24">{{ signOutLabel }}</button>
     </div>
   </sc-if>
+  <div style="position:relative;z-index:1;text-align:center;padding:4px 16px 28px;font-size:12px;font-weight:600"><a href="https://open-meteo.com/" target="_blank" rel="noopener" style="color:#7A5A3C;background:rgba(247,238,223,.85);border-radius:999px;padding:4px 10px;text-decoration:none">Weather data by Open-Meteo.com</a></div>
 
   <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeLb }}" style="position:fixed;inset:0;z-index:2000;background:rgba(18,24,29,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px">
@@ -754,6 +757,29 @@ const wxIcon = w => { if (!w) return ''; const c = w.c, n = w.d === 0 ? 'night' 
 const wxStr = w => w ? Math.round(w.f) + '°F · ' + Math.round((w.f - 32) * 5 / 9) + '°C' : 'Weather loading';
 const mapsUrl = p => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.address ? p.name + ', ' + p.address : p.poi ? p.name + ', ' + p.place : (p.q || p.name + ' ' + p.city));
 const wxUrl = city => 'https://www.google.com/search?q=' + encodeURIComponent('weather ' + city);
+const SKY_LIGHT = [255, 253, 248], SKY_DARK = [24, 34, 44];
+const rgbCss = (c, a) => { const v = c.map(x => Math.max(0, Math.min(255, Math.round(x)))); return a == null ? 'rgb(' + v.join(',') + ')' : 'rgba(' + v.join(',') + ',' + a + ')'; };
+const mixRgb = (a, b, k) => a.map((x, i) => x + (b[i] - x) * k);
+const relLum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+const contrast = (a, b) => { const x = relLum(a), y = relLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+// Text and panel colors that stay readable on the live sky behind the Right now card.
+const skyTheme = (lat, lon, t, weather) => {
+  if (!window.Sky) return null;
+  const k = window.Sky.colors({ lat, lon, date: new Date(t), weather }), top = k.sky[0], mid = k.sky[1];
+  const cloudy = weather !== 'clear', bgs = cloudy ? [top, mid, mixRgb(mid, k.cloud.lit, 0.85)] : [top, mid];
+  const worst = ink => Math.min.apply(null, bgs.map(b => contrast(ink, b)));
+  const light = worst(SKY_LIGHT) >= worst(SKY_DARK), ink = light ? SKY_LIGHT : SKY_DARK;
+  let mk = 0.3; while (mk > 0 && Math.min.apply(null, bgs.map(b => contrast(mixRgb(ink, mid, mk), b))) < 4.5) mk -= 0.05;
+  const accent = light ? [240, 205, 122] : [107, 63, 29];
+  // panels: a deeper shade of the sky; white text on dark skies, dark text on light skies
+  let pill = mixRgb(mid, [0, 0, 0], light ? 0.38 : 0.17), n = 0;
+  while (contrast(light ? SKY_LIGHT : SKY_DARK, pill) < (light ? 7.5 : 6.2) && n++ < 12) pill = light ? mixRgb(pill, [0, 0, 0], 0.12) : mixRgb(pill, [255, 255, 255], 0.1);
+  const pillInk = light ? SKY_LIGHT : SKY_DARK;
+  let pk = 0.35; while (pk > 0 && contrast(mixRgb(pillInk, pill, pk), pill) < 4.8) pk -= 0.05;
+  return { bg: rgbCss(mid), ink: rgbCss(ink), muted: rgbCss(mixRgb(ink, mid, Math.max(0, mk))), accent: rgbCss(Math.min.apply(null, bgs.map(b => contrast(accent, b))) >= 3.2 ? accent : ink),
+    tile: rgbCss(pill, 0.92), edge: light ? 'inset 0 0 0 1px rgba(255,255,255,.1)' : 'inset 0 0 0 1px rgba(24,34,44,.08)', pillInk: rgbCss(pillInk), pillMuted: rgbCss(mixRgb(pillInk, pill, Math.max(0, pk))),
+    shadow: light ? '0 1px 2px rgba(8,14,28,.45)' : '0 1px 1px rgba(255,255,255,.35)', phase: k.phase };
+};
 const ago = ms => { const m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' hr ago' : Math.round(m / 1440) + ' days ago'; };
 const b64 = u => btoa(String.fromCharCode.apply(null, u));
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -780,8 +806,20 @@ class Component extends DCLogic {
     if (saved && crypto.subtle && (await sha(saved)) === PASS_HASH) this.open(saved);
     else this.setState({ phase: 'locked' });
   }
-  componentWillUnmount() { [this.rot, this.tick, this.wxT, this.pollT, this.mapT, this.stT].forEach(clearInterval); this.stopWatch(); }
-  componentDidUpdate() { this.syncMap(); }
+  componentWillUnmount() { if (this.skyCtl) this.skyCtl.destroy(); [this.rot, this.tick, this.wxT, this.pollT, this.mapT, this.stT].forEach(clearInterval); this.stopWatch(); }
+  componentDidUpdate() { this.syncMap(); this.syncSky(); }
+  skyRef = el => {
+    if (el === this.skyEl) return;
+    if (this.skyCtl) { this.skyCtl.destroy(); this.skyCtl = null; }
+    this.skyEl = el; this.skyKey = null;
+    if (el && window.Sky) { const a = this._skyArgs || {}; this.skyCtl = window.Sky.create(el, { lat: a.lat, lon: a.lon, date: new Date(a.t || Date.now()), weather: a.weather }); this.syncSky(); }
+  };
+  syncSky() {
+    const a = this._skyArgs; if (!this.skyCtl || !a) return;
+    const key = a.lat.toFixed(3) + ',' + a.lon.toFixed(3) + ',' + a.weather + ',' + Math.floor(a.t / 60000);
+    if (key === this.skyKey) return;
+    this.skyKey = key; this.skyCtl.set({ lat: a.lat, lon: a.lon, date: new Date(a.t), weather: a.weather });
+  }
 
   t() { return URL_NOW != null ? URL_NOW : this.state.now; }
 
@@ -1164,9 +1202,12 @@ class Component extends DCLogic {
     const alt = sunAlt(c.pos[0], c.pos[1], t), hr = hourOf(t, c.tz);
     const phase = alt < -6 ? 'night' : alt < 0 ? (hr < 12 ? 'dawn' : 'dusk') : alt < 10 ? (hr < 12 ? 'morning' : 'golden') : 'day';
     const night = phase === 'night';
-    const sky = night
+    const wxNow = c.live && st.fixWx ? st.fixWx : wx, skyCond = wxNow && window.Sky ? window.Sky.weatherFromCode(wxNow.c) : 'clear';
+    this._skyArgs = { lat: c.pos[0], lon: c.pos[1], t, weather: skyCond };
+    const sky = skyTheme(c.pos[0], c.pos[1], t, skyCond) || (night
       ? { bg: '#1F2A33', ink: '#F4F1EA', muted: '#B8C2CF', tile: 'rgba(255,255,255,.08)', accent: 'oklch(0.82 0.1 85)' }
-      : { bg: 'radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4)', ink: '#2E2117', muted: '#5E4B3A', tile: '#F7EEDF', accent: '#7A4B26' };
+      : { bg: 'radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4)', ink: '#2E2117', muted: '#5E4B3A', tile: '#F7EEDF', accent: '#7A4B26' });
+    if (!sky.shadow) Object.assign(sky, { shadow: 'none', edge: 'none', pillInk: sky.ink, pillMuted: sky.muted });
     const IMG = (...urls) => urls.map(u => 'url("' + u + '") center/cover no-repeat').join(', ');
     const CLOUD = (x, y, w, h, a) => 'radial-gradient(' + w + ' ' + h + ' at ' + x + ' ' + y + ', rgba(255,255,255,' + a + ') 0%, rgba(255,255,255,' + (a * .6) + ') 45%, rgba(255,255,255,0) 72%)';
     const clouds = [CLOUD('12%', '30%', '28%', '16%', .95), CLOUD('30%', '24%', '22%', '13%', .9), CLOUD('70%', '40%', '32%', '18%', .95), CLOUD('88%', '28%', '20%', '12%', .85), CLOUD('48%', '62%', '36%', '16%', .8), CLOUD('8%', '72%', '26%', '12%', .7), CLOUD('92%', '70%', '24%', '12%', .75)].join(', ');
@@ -1260,7 +1301,7 @@ class Component extends DCLogic {
       today = { title: todayDay.title, count: ds.items.filter(x => x.done).length + ' of ' + ds.items.length + ' done',
         items: ds.items.map((x, i) => {
           const isNext = i === nextI && x.at != null;
-          return { text: x.text, mark: x.done ? '✓' : '', fill: x.done ? GO : 'transparent', ring: phase === 'night' ? '#8C97A5' : '#9AA3AC', op: 1, weight: 500, bg: 'transparent', isNext, inText: isNext ? 'in ' + dur(x.at - t) : '' };
+          return { text: x.text, mark: x.done ? '✓' : '', fill: x.done ? GO : 'transparent', ring: sky.pillMuted || (phase === 'night' ? '#8C97A5' : '#9AA3AC'), op: 1, weight: 500, bg: 'transparent', isNext, inText: isNext ? 'in ' + dur(x.at - t) : '' };
         }) };
     }
 
@@ -1385,7 +1426,7 @@ class Component extends DCLogic {
       vc: { usa: on('usa') ? '#FFFFFF' : '#1F2A33', world: on('world') ? '#FFFFFF' : '#1F2A33', th: on('th') ? '#FFFFFF' : '#1F2A33' },
       viewUSA: () => this.fit('usa'), viewWorld: () => this.fit('world'), viewTH: () => this.fit('th'),
       findUs: () => { if (!this.map) return; this.map.flyTo(mll(c.pos), c.k === 'flight' ? 4 : c.live ? 14 : 11, { duration: 1 }); this.setState({ view: null, sel: null }); },
-      locLabel, dayMapRef: this.dayMapRef, showReturn: showRet, page, isAdmin: !!st.admin, families, dc, dots, cal, miles, nav: Object.fromEntries(NAV_IDS.map(id => [id, { bg: (st.navOn || 'now') === id ? '#5C3D24' : 'transparent', ink: (st.navOn || 'now') === id ? '#F7EEDF' : '#5C3D24', go: () => this.setState({ navOn: id }) }])), calMonth: st.dayIdx != null && DAYS[dayI].d.slice(5, 7) === '11' ? 'November 2026' : 'October 2026', dayShown: st.dayIdx != null, dayClose: () => this.setState({ dayIdx: null }), dayCardRef: this.dayCardRef, calOpen: !!st.calOpen, openCal: () => this.setState({ calOpen: true }), closeCal: () => this.setState({ calOpen: false }), stop: e => e.stopPropagation(), dayPrev: () => goDay(dayI - 1), dayNext: () => goDay(dayI + 1), dayToday: () => this.setState({ dayIdx: null }), notOnToday: ti >= 0 && dayI !== ti,
+      locLabel, dayMapRef: this.dayMapRef, skyRef: this.skyRef, showReturn: showRet, page, isAdmin: !!st.admin, families, dc, dots, cal, miles, nav: Object.fromEntries(NAV_IDS.map(id => [id, { bg: (st.navOn || 'now') === id ? '#5C3D24' : 'transparent', ink: (st.navOn || 'now') === id ? '#F7EEDF' : '#5C3D24', go: () => this.setState({ navOn: id }) }])), calMonth: st.dayIdx != null && DAYS[dayI].d.slice(5, 7) === '11' ? 'November 2026' : 'October 2026', dayShown: st.dayIdx != null, dayClose: () => this.setState({ dayIdx: null }), dayCardRef: this.dayCardRef, calOpen: !!st.calOpen, openCal: () => this.setState({ calOpen: true }), closeCal: () => this.setState({ calOpen: false }), stop: e => e.stopPropagation(), dayPrev: () => goDay(dayI - 1), dayNext: () => goDay(dayI + 1), dayToday: () => this.setState({ dayIdx: null }), notOnToday: ti >= 0 && dayI !== ti,
       dayTS: e => { this._tx = e.touches[0].clientX; }, dayTE: e => { const dx = e.changedTouches[0].clientX - (this._tx || 0); if (Math.abs(dx) > 50) goDay(dayI + (dx < 0 ? 1 : -1)); },
       sel, days, hasToday: ti >= 0, tripPct, tripLabel, flights, flightsDone: flights.length ? flights.length + ' to go' : 'All done!',
       flTop: (() => { const top = []; const f = flights.findIndex(x => x.flying); if (f >= 0) top.push(Object.assign({}, flights[f], { tag: 'Right now' })); const n = flights.findIndex((x, k) => !x.flying && k > f); if (n >= 0) top.push(Object.assign({}, flights[n], { tag: 'Up next' })); return top; })(),
