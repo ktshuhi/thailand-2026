@@ -418,8 +418,10 @@ nav::-webkit-scrollbar{display:none}
           <sc-for list="{{ photos }}" as="ph" hint-placeholder-count="4">
             <button onClick="{{ ph.open }}" aria-label="{{ ph.cap }}" style="padding:10px 10px 0;border:0;background:#FFFFFF;color:#2E2117;box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 24px rgba(31,42,51,.16);transform:rotate({{ ph.rot }});cursor:pointer;display:flex;flex-direction:column;text-align:center;font:inherit">
               <img src="{{ ph.src }}" alt="{{ ph.cap }}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#EDE7DA">
-              <span style="font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.1;padding:8px 2px 2px;min-height:32px;overflow-wrap:anywhere">{{ ph.cap }}</span>
-              <span style="font-size:11px;font-weight:600;color:#6B7580;padding-bottom:10px">{{ ph.meta }}</span>
+              <span style="font-family:'Caveat',cursive;font-weight:700;font-size:25px;line-height:1;color:#5C3D24;padding:10px 2px 0;overflow-wrap:anywhere;transform:rotate(-1.5deg);transform-origin:left center">{{ ph.loc }}</span>
+              <span style="font-family:'Caveat',cursive;font-weight:600;font-size:17px;line-height:1.1;color:#9A7350;padding:2px 4px 0">{{ ph.date }}</span>
+              <sc-if value="{{ ph.hasCap }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Caveat',cursive;font-weight:600;font-size:19px;line-height:1.15;color:#2E2117;padding:6px 2px 0;margin-top:6px;border-top:1px dashed #E2D2B8;overflow-wrap:anywhere">{{ ph.cap }}</span></sc-if>
+              <span style="display:block;height:12px"></span>
             </button>
           </sc-for>
         </div>
@@ -433,7 +435,11 @@ nav::-webkit-scrollbar{display:none}
   <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeLb }}" style="position:fixed;inset:0;z-index:2000;background:rgba(18,24,29,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px">
       <img src="{{ lb.src }}" alt="{{ lb.cap }}" style="max-width:100%;max-height:74vh;border-radius:16px;object-fit:contain;display:block">
-      <div style="color:#FFFFFF;font-family:'Caveat',cursive;font-size:28px;font-weight:700;text-align:center">{{ lb.cap }}</div>
+      <div style="text-align:center;font-family:'Caveat',cursive;line-height:1.1">
+        <div style="color:#F4E9D6;font-size:30px;font-weight:700">{{ lb.loc }}</div>
+        <div style="color:#D9C3A0;font-size:20px;font-weight:600">{{ lb.date }}</div>
+        <sc-if value="{{ lb.hasCap }}" hint-placeholder-val="{{ false }}"><div style="color:#FFFFFF;font-size:24px;font-weight:600;margin-top:6px">{{ lb.cap }}</div></sc-if>
+      </div>
       <div style="display:flex;gap:10px">
         <button onClick="{{ lbPrev }}" aria-label="Previous photo" style="width:48px;height:48px;border-radius:50%;border:0;background:#F4E9D6;color:#2E2117;font:800 20px Figtree,sans-serif;cursor:pointer">‹</button>
         <button onClick="{{ closeLb }}" style="height:48px;border-radius:999px;border:0;background:#F4E9D6;color:#2E2117;font:700 15px Figtree,sans-serif;cursor:pointer;padding:0 20px">Close</button>
@@ -621,7 +627,40 @@ const NAV_IDS = ['now', 'map', 'days', 'stays', 'flights', 'contacts', 'photos']
 const ghRepo = () => { if (GH_REPO) return GH_REPO; if (!/\.github\.io$/.test(location.hostname)) return ''; const seg = location.pathname.split('/')[1]; return location.hostname.split('.')[0] + '/' + (seg && !seg.includes('.') ? seg : location.hostname); };
 const capEnc = t => { const b = new TextEncoder().encode(t); let x = ''; b.forEach(c => { x += String.fromCharCode(c); }); return btoa(x).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
 const capDec = t => { try { const x = atob(t.replace(/-/g, '+').replace(/_/g, '/')); return new TextDecoder().decode(Uint8Array.from(x, c => c.charCodeAt(0))); } catch (e) { return ''; } };
-const parsePhoto = f => { const p = f.name.split('.'); return { name: f.name, url: f.url, ts: +p[0] || 0, who: p.length > 3 ? p[1] : '', cap: p.length > 3 ? capDec(p[2]) : '' }; };
+const parsePhoto = f => { const p = f.name.split('.'); return { name: f.name, url: f.url, ts: +p[0] || 0, who: p.length > 3 ? p[1] : '', cap: p.length > 3 ? capDec(p[2]) : '', loc: p.length > 4 ? capDec(p[3]) : '' }; };
+// Reads the photo's own time and GPS (if the phone kept them) from a JPEG's EXIF block.
+const readExif = async f => {
+  try {
+    const v = new DataView(await f.slice(0, 262144).arrayBuffer());
+    if (v.getUint16(0) !== 0xFFD8) return null;
+    let o = 2;
+    while (o + 10 < v.byteLength) {
+      const mk = v.getUint16(o), len = v.getUint16(o + 2);
+      if (mk === 0xFFE1 && v.getUint32(o + 4) === 0x45786966) return exifTiff(v, o + 10);
+      if ((mk & 0xFF00) !== 0xFF00 || mk === 0xFFDA) break;
+      o += 2 + len;
+    }
+  } catch (e) {}
+  return null;
+};
+const exifTiff = (v, t) => {
+  const le = v.getUint16(t) === 0x4949, u16 = q => v.getUint16(q, le), u32 = q => v.getUint32(q, le);
+  const ifd = q => { const out = {}, n = u16(t + q); for (let i = 0; i < n; i++) { const e = t + q + 2 + i * 12; out[u16(e)] = { count: u32(e + 4), off: e + 8 }; } return out; };
+  const str = en => { const q = en.count > 4 ? t + u32(en.off) : en.off; let x = ''; for (let i = 0; i < en.count - 1; i++) x += String.fromCharCode(v.getUint8(q + i)); return x; };
+  const rat = (en, i) => { const q = t + u32(en.off) + i * 8, d = u32(q + 4); return d ? u32(q) / d : 0; };
+  const r = {}, i0 = ifd(u32(t + 4));
+  try { if (i0[0x8769]) { const ex = ifd(u32(i0[0x8769].off)); if (ex[0x9003]) r.dt = str(ex[0x9003]); if (ex[0x9011]) r.off = str(ex[0x9011]); } } catch (e) {}
+  try { if (i0[0x8825]) { const g = ifd(u32(i0[0x8825].off)); if (g[2] && g[4]) { const dms = en => rat(en, 0) + rat(en, 1) / 60 + rat(en, 2) / 3600; let la = dms(g[2]), lo = dms(g[4]); if (g[1] && v.getUint8(g[1].off) === 83) la = -la; if (g[3] && v.getUint8(g[3].off) === 87) lo = -lo; if (la || lo) r.ll = [la, lo]; } } } catch (e) {}
+  return r;
+};
+const exifTime = x => { if (!x || !x.dt) return 0; const m = x.dt.match(/^(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/); if (!m) return 0; const off = /^[+-]\d\d:\d\d$/.test(x.off || '') ? x.off : '+07:00'; const ms = Date.parse(m[1] + '-' + m[2] + '-' + m[3] + 'T' + m[4] + ':' + m[5] + ':' + m[6] + off); return isFinite(ms) && ms < Date.now() + 864e5 && ms > Date.parse('2026-09-01') ? ms : 0; };
+// City for a GPS point: snap to a trip city within 40 km, otherwise ask OpenStreetMap.
+const cityFor = async ll => {
+  let best = null, bd = 40;
+  for (const k in P) { const q = P[k]; if (!q.city) continue; const d = km(ll, q.ll); if (d < bd) { bd = d; best = q.city; } }
+  if (best) return best;
+  try { const a = (await (await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&accept-language=en&lat=' + ll[0] + '&lon=' + ll[1])).json()).address || {}; return a.city || a.town || a.village || a.municipality || a.county || a.state || ''; } catch (e) { return ''; }
+};
 
 const D = Math.PI / 180;
 const fmt = (ms, tz, o) => new Intl.DateTimeFormat('en-US', Object.assign({ timeZone: tz }, o)).format(ms);
@@ -777,8 +816,9 @@ class Component extends DCLogic {
     for (let i = 0; i < up.items.length; i++) {
       this.setState({ up: Object.assign({}, this.state.up, { busy: true, err: false, msg: 'Posting ' + (i + 1) + ' of ' + up.items.length + '…' }) });
       try {
-        const it = up.items[i], b64 = await this.shrink(it.f);
-        const name = Date.now() + '.' + who + '.' + capEnc((it.cap || '').trim().slice(0, 80)) + '.jpg';
+        const it = up.items[i], b64 = await this.shrink(it.f), ex = await readExif(it.f);
+        const ts = (exifTime(ex) || Date.now()) + i, loc = ex && ex.ll ? await cityFor(ex.ll) : '';
+        const name = ts + '.' + who + '.' + capEnc((it.cap || '').trim().slice(0, 80)) + '.' + capEnc(loc.slice(0, 40)) + '.jpg';
         const res = await fetch('https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '/' + name, { method: 'PUT', headers: { Authorization: 'Bearer ' + key, Accept: 'application/vnd.github+json' }, body: JSON.stringify({ message: 'Trip photo from ' + who, content: b64, branch: GH_BRANCH }) });
         if (res.status === 401 || res.status === 403 || res.status === 404) { ls.set('kt_gh', ''); this.setState({ up: Object.assign({}, this.state.up, { busy: false, err: true, msg: "The upload key didn't work. Tap + Add photos to enter it again." }) }); return; }
         if (!res.ok) throw new Error();
@@ -951,6 +991,14 @@ class Component extends DCLogic {
     if (tip !== this.meTip) { this.meTip = tip; this.me.unbindTooltip(); if (tip) this.me.bindTooltip(tip, { permanent: true, direction: 'top', offset: [0, -50], className: 'kt-bubble' }).openTooltip(); }
   }
   segAt(t) { const i = SEGS.findIndex(sg => t >= sg.s && t < sg.e); return i < 0 ? null : Object.assign({}, SEGS[i], { idx: i }); }
+  photoPlace(ts) {
+    try {
+      const c = this.cur(ts), tz = c.tz || VISITOR_TZ;
+      if (c.k === 'flight') return { city: 'Somewhere in the sky', tz };
+      if (c.k === 'drive') return { city: 'On the road', tz };
+      const q = P[c.p]; return { city: (q && q.city) || 'Milford', tz };
+    } catch (e) { return { city: '', tz: VISITOR_TZ }; }
+  }
   cur(t) {
     let c;
     const sg = this.segAt(t);
@@ -1209,7 +1257,7 @@ class Component extends DCLogic {
     }) }));
 
     const album = (st.album || []).map(parsePhoto).sort((x, y) => y.ts - x.ts);
-    const photos = album.map((p, i) => { let h = 0; for (const ch of p.name) h = (h * 31 + ch.charCodeAt(0)) | 0; return { src: p.url, cap: p.cap, rot: ((Math.abs(h) % 7) - 3) * 0.8 + 'deg', meta: [p.ts ? fmt(p.ts, VISITOR_TZ, { month: 'short', day: 'numeric' }) : '', p.who === 'kyle' ? 'Kyle' : p.who === 'tj' ? 'TJ' : ''].filter(Boolean).join(' · '), open: () => this.setState({ lb: i }) }; });
+    const photos = album.map((p, i) => { let h = 0; for (const ch of p.name) h = (h * 31 + ch.charCodeAt(0)) | 0; const pl = p.ts ? this.photoPlace(p.ts) : { city: '', tz: VISITOR_TZ }; return { src: p.url, cap: p.cap, hasCap: !!p.cap, loc: p.loc || pl.city, date: p.ts ? fmt(p.ts, pl.tz, { weekday: 'short', month: 'long', day: 'numeric' }) : '', rot: ((Math.abs(h) % 7) - 3) * 0.8 + 'deg', open: () => this.setState({ lb: i }) }; });
     const upS = st.up, setWho = w => () => { ls.set('kt_who', w); this.setState({ who: w }); };
     const upV = upS ? { needKey: !!upS.needKey, keyDraft: upS.keyDraft || '', hasItems: !upS.needKey && upS.items.length > 0, busy: !!upS.busy, msg: upS.msg || '', msgInk: upS.err ? 'oklch(0.5 0.17 25)' : '#5A4F57',
       title: upS.items.length === 1 ? 'Add a caption' : 'Add captions', goLabel: upS.needKey ? 'Save key' : upS.busy ? 'Posting…' : 'Post ' + (upS.items.length === 1 ? 'photo' : upS.items.length + ' photos'), goOp: upS.busy ? .6 : 1,
@@ -1256,7 +1304,7 @@ class Component extends DCLogic {
       flRest: (() => { const f = flights.findIndex(x => x.flying); const n = flights.findIndex((x, k) => !x.flying && k > f); return flights.filter((x, k) => k !== f && k !== n).map(x => Object.assign({}, x, { tag: '' })); })(),
       hasRest: flights.length > 2 || (flights.length === 2 && !flights.some(x => x.flying)), showRest: !!st.showFl, toggleFl: () => this.setState(z => ({ showFl: !z.showFl })),
       restLabel: st.showFl ? 'Hide other flights' : 'Show the other flights', stays, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
-      lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap } : { src: '', cap: '' },
+      lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap, hasCap: photos[lbi].hasCap, loc: photos[lbi].loc, date: photos[lbi].date } : { src: '', cap: '', hasCap: false, loc: '', date: '' },
       hasPhotos: photos.length > 0, noPhotos: photos.length === 0, fileRef: this.fileRef, addPhotos: this.addPhotos, onFiles: this.onFiles, upOpen: !!upS, up: upV, upGo: this.upGo, closeUp: () => this.setState({ up: null }), whoKyle: setWho('kyle'), whoTJ: setWho('tj'),
       setKeyDraft: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { keyDraft: v }) })); },
       closeLb: () => this.setState({ lb: null }), lbPrev: step(-1), lbNext: step(1),
