@@ -906,9 +906,13 @@ class Component extends DCLogic {
     this.dayLayer.clearLayers();
     if (prevI != null && DAYS[prevI] && DAYS[prevI].p !== day.p) L.polyline(unwrap([mll(P[DAYS[prevI].p].ll), ll]), { color: '#E83F7A', weight: 4, dashArray: '2 9', lineCap: 'round' }).addTo(this.dayLayer);
     const imgs = (DAY_STK[day.d] || []).map((n, j) => '<img src="' + S(n) + '" alt="" style="width:78px;height:78px;object-fit:contain;transform:' + (/plane/.test(n) && DAY_WEST[day.d] ? 'scaleX(-1) ' : '') + 'rotate(' + (j % 2 ? 6 : -6) + 'deg);filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))">').join('');
-    L.circleMarker(ll, { radius: 7, color: '#fff', weight: 3, fillColor: ACC, fillOpacity: 1, interactive: false }).addTo(this.dayLayer);
-    L.marker(ll, { interactive: false, icon: L.divIcon({ className: '', iconSize: [0, 0], html: '<div style="display:flex;gap:2px;transform:translate(-50%,-108%)">' + imgs + '</div>' }) }).addTo(this.dayLayer);
-    if (instant || prevI == null) this.dayMap.setView(ll, z, { animate: false }); else this.dayMap.flyTo(ll, z, { duration: 3.5, easeLinearity: 0.15 });
+    const dot = L.circleMarker(ll, { radius: 7, color: '#fff', weight: 3, fillColor: ACC, fillOpacity: 1, interactive: false });
+    const pin = L.marker(ll, { interactive: false, icon: L.divIcon({ className: '', iconSize: [0, 0], html: '<div style="display:flex;gap:2px;transform:translate(-50%,-108%)">' + imgs + '</div>' }) });
+    // Stickers are placed after the map finishes moving so they don't jitter during the zoom.
+    let placed = false; const place = () => { if (placed || this.dayKey !== i || !this.dayLayer) return; placed = true; dot.addTo(this.dayLayer); pin.addTo(this.dayLayer); const e = pin.getElement() && pin.getElement().firstChild; if (e && e.animate) e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'ease-out' }); };
+    if (this._dayFlyOff) { this.dayMap.off('moveend', this._dayFlyOff); this._dayFlyOff = null; }
+    if (instant || prevI == null) { this.dayMap.setView(ll, z, { animate: false }); place(); }
+    else { this._dayFlyOff = () => { this._dayFlyOff = null; place(); }; this.dayMap.once('moveend', this._dayFlyOff); setTimeout(place, 2700); this.dayMap.flyTo(ll, z, { duration: 2.2, easeLinearity: 0.25 }); }
   }
   curView() {
     const c = this.cur(this.t());
