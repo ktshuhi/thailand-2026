@@ -431,11 +431,14 @@ nav::-webkit-scrollbar{display:none}
       </sc-if>
     </section>
   </main>
-  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
-    <div style="display:flex;justify-content:center;padding:8px 16px 28px">
+  <sc-if value="{{ showFoot }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 16px 28px">
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
       <button type="button" onClick="{{ openStats }}" aria-label="Site analytics" title="Analytics" style="width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#9A7350;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#F4E9D6;color:#5C3D24">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-4"/><path d="M12 16V7"/><path d="M17 16v-7"/></svg>
       </button>
+      </sc-if>
+      <button type="button" onClick="{{ signOut }}" style="min-height:44px;border:0;border-radius:999px;background:transparent;color:#9A7350;font:700 14px Figtree,sans-serif;cursor:pointer;padding:0 14px" style-hover="background:#F4E9D6;color:#5C3D24">{{ signOutLabel }}</button>
     </div>
   </sc-if>
 
@@ -452,6 +455,7 @@ nav::-webkit-scrollbar{display:none}
         <button onClick="{{ closeLb }}" style="height:48px;border-radius:999px;border:0;background:#F4E9D6;color:#2E2117;font:700 15px Figtree,sans-serif;cursor:pointer;padding:0 20px">Close</button>
         <button onClick="{{ lbNext }}" aria-label="Next photo" style="width:48px;height:48px;border-radius:50%;border:0;background:#F4E9D6;color:#2E2117;font:800 20px Figtree,sans-serif;cursor:pointer">›</button>
       </div>
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}"><button onClick="{{ delPhoto }}" disabled="{{ delBusy }}" style="min-height:40px;border:1px solid rgba(244,233,214,.35);border-radius:999px;background:transparent;color:#F4C9BD;font:700 14px Figtree,sans-serif;cursor:pointer;padding:0 16px">{{ delLabel }}</button></sc-if>
     </div>
   </sc-if>
   <sc-if value="{{ upOpen }}" hint-placeholder-val="{{ false }}">
@@ -761,7 +765,8 @@ class Component extends DCLogic {
   async componentDidMount() {
     this._spy = () => { if (this._spyR) return; this._spyR = requestAnimationFrame(() => { this._spyR = 0; let on = 'now'; for (const id of NAV_IDS) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < 150) on = id; } if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 4) on = 'photos'; if (on !== this.state.navOn) this.setState({ navOn: on }); }); };
     window.addEventListener('scroll', this._spy, { passive: true });
-    this.loadAlbum(); this._albumT = setInterval(() => this.loadAlbum(), 300000);
+    this.loadAlbum(); this._albumT = setInterval(() => this.loadAlbum(), 120000);
+    this._bootAt = Date.now(); this._freshT = setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - this._bootAt > 3 * 3600000 && !this.state.up && this.state.lb == null && !this.state.gc) location.reload(); }, 600000);
     if ('serviceWorker' in navigator && location.protocol === 'https:' && !/\.dc\.html$/.test(location.pathname)) navigator.serviceWorker.register('sw.js').catch(() => {});
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.bip = e; this.setState({ canPrompt: true }); });
     window.addEventListener('appinstalled', () => this.setState({ installed: true }));
@@ -789,7 +794,9 @@ class Component extends DCLogic {
     if (who) this.startShare(who);
   }
   onVis = () => {
-    if (document.visibilityState !== 'visible') return;
+    if (document.visibilityState !== 'visible') { this._hidAt = Date.now(); return; }
+    if (this._hidAt && Date.now() - this._hidAt > 30 * 60000 && !this.state.up) { location.reload(); return; }
+    this.loadAlbum();
     this.setState({ now: Date.now() }); this.poll(); this.trackFlight(); this.loadStatus();
     if (this.state.share) { this.sendNow(); if (this.state.wake) this.reqWake(); }
   };
@@ -831,13 +838,37 @@ class Component extends DCLogic {
   async loadAlbum() {
     const r = ghRepo(); if (!r) return;
     try {
-      const res = await fetch('https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '?ref=' + GH_BRANCH, { cache: 'no-store' });
+      const res = await fetch('https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '?ref=' + GH_BRANCH, { cache: 'no-store', headers: this._albumTag ? { 'If-None-Match': this._albumTag } : {} });
+      if (res.status === 304) return;
+      if (res.ok) this._albumTag = res.headers.get('ETag') || null;
       if (res.status === 404) { ls.set('kt_album', []); this.setState({ album: [] }); return; }
       if (!res.ok) return;
       const list = (await res.json()).filter(f => f.type === 'file' && /\.(jpe?g|png|webp)$/i.test(f.name)).map(f => ({ name: f.name, url: f.download_url }));
       ls.set('kt_album', list); this.setState({ album: list });
     } catch (e) {}
   }
+  deletePhoto = async name => {
+    const r = ghRepo(), key = ls.get('kt_gh', '');
+    if (!r || !name) return;
+    if (!key) { alert('Set up uploads on this phone first (tap + Add photos), then you can delete photos.'); return; }
+    if (!confirm('Delete this photo for everyone?')) return;
+    this.setState({ delBusy: true });
+    const url = 'https://api.github.com/repos/' + r + '/contents/' + ALBUM_DIR + '/' + name, h = { Authorization: 'Bearer ' + key, Accept: 'application/vnd.github+json' };
+    try {
+      const g = await fetch(url + '?ref=' + GH_BRANCH, { headers: h, cache: 'no-store' });
+      if (g.status !== 404) {
+        if (!g.ok) throw new Error(String(g.status));
+        const sha = (await g.json()).sha;
+        const d = await fetch(url, { method: 'DELETE', headers: h, body: JSON.stringify({ message: 'Remove trip photo', sha, branch: GH_BRANCH }) });
+        if (!d.ok) throw new Error(String(d.status));
+      }
+      this._albumTag = null;
+      this.setState(s => { const album = (s.album || []).filter(p => p.name !== name); ls.set('kt_album', album); return { album, lb: null, delBusy: false }; });
+    } catch (e) {
+      this.setState({ delBusy: false });
+      alert("Couldn't delete that photo. " + (e && (e.message === '401' || e.message === '403') ? 'The upload key needs write access to the repo.' : 'Check your signal and try again.'));
+    }
+  };
   loadStats = async () => {
     const base = 'https://tj-kyle-thailand.goatcounter.com/counter/';
     const root = location.pathname.replace(/index\.html$/, '');
@@ -1112,7 +1143,7 @@ class Component extends DCLogic {
         if (!crypto.subtle) { this.setState({ err: 'This page needs a secure (https) connection.' }); return; }
         const pw = st.pass.trim(), h = await sha(pw);
         if (st.role === 'us' && h === ADMIN_HASH) {
-          try { const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']); const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: new TextEncoder().encode('kt-trip-admin'), iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']); const w = unb64(FAM_WRAP); const fam = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: w.slice(0, 12) }, k, w.slice(12))); ls.set('kt_admin', true); this.setState({ admin: true }); await this.open(fam); if (this._shareAfter) { const w = this._shareAfter; this._shareAfter = null; this.startShare(w); setTimeout(() => this.sendNow(), 400); } } catch (x) { this.setState({ err: "That's not it. Try again." }); }
+          try { const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']); const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: new TextEncoder().encode('kt-trip-admin'), iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']); const w = unb64(FAM_WRAP); const fam = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: w.slice(0, 12) }, k, w.slice(12))); ls.set('kt_admin', true); ls.set('kt_tester', true); this.setState({ admin: true }); await this.open(fam); if (this._shareAfter) { const w = this._shareAfter; this._shareAfter = null; this.startShare(w); setTimeout(() => this.sendNow(), 400); } } catch (x) { this.setState({ err: "That's not it. Try again." }); }
         } else if (st.role === 'fam' && h === PASS_HASH) { ls.set('kt_admin', null); this.setState({ admin: false }); this.open(pw); }
         else this.setState({ err: "That's not it. Try again." });
       },
@@ -1360,6 +1391,9 @@ class Component extends DCLogic {
       lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap, hasCap: photos[lbi].hasCap, loc: photos[lbi].loc, date: photos[lbi].date } : { src: '', cap: '', hasCap: false, loc: '', date: '' },
       hasPhotos: photos.length > 0, noPhotos: photos.length === 0, fileRef: this.fileRef, addPhotos: this.addPhotos, onFiles: this.onFiles, upOpen: !!upS, up: upV, upGo: this.upGo, closeUp: () => this.setState({ up: null }), whoKyle: setWho('kyle'), whoTJ: setWho('tj'),
       setKeyDraft: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { keyDraft: v }) })); },
+      showFoot: !!st.admin || !!ls.get('kt_tester', false), signOutLabel: st.admin ? 'Sign out' : 'Sign out of Family view',
+      signOut: () => { ls.set('kt_pass', null); ls.set('kt_admin', null); ls.set('kt_share', null); this.stopShare(); location.reload(); },
+      delPhoto: e => { e.stopPropagation(); if (lbi != null && album[lbi]) this.deletePhoto(album[lbi].name); }, delBusy: !!st.delBusy, delLabel: st.delBusy ? 'Deleting…' : 'Delete photo',
       gcOpen: !!st.gc, gc: { loading: !!(st.gc && st.gc.loading), ready: !!(st.gc && st.gc.ready), hasErr: !!(st.gc && st.gc.err), err: (st.gc && st.gc.err) || '', total: (st.gc && st.gc.total) || '0', rows: (st.gc && st.gc.rows) || [] }, openStats: this.loadStats, closeStats: () => this.setState({ gc: null }),
       closeLb: () => this.setState({ lb: null }), lbPrev: step(-1), lbNext: step(1),
       lock: () => { ls.set('kt_pass', null); ls.set('kt_share', null); this.stopShare(); location.reload(); },
@@ -1367,7 +1401,7 @@ class Component extends DCLogic {
   }
 }
 </script>
-<script>try{var a=localStorage.getItem('kt_admin');if(a==='true'||a==='"true"')localStorage.setItem('skipgc','t');else localStorage.removeItem('skipgc');}catch(e){}</script>
+<script>try{var a=localStorage.getItem('kt_admin'),k=localStorage.getItem('kt_tester');if(a==='true'||a==='"true"'){localStorage.setItem('kt_tester','true');k='true';}if(k==='true')localStorage.setItem('skipgc','t');else localStorage.removeItem('skipgc');}catch(e){}</script>
 <script data-goatcounter="https://tj-kyle-thailand.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
