@@ -146,10 +146,10 @@ nav::-webkit-scrollbar{display:none}
               <sc-if value="{{ trk.showEyebrow }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.accent }};white-space:nowrap">{{ trk.eyebrow }}</span></sc-if>
               <sc-if value="{{ trk.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 8px;background:{{ trk.badgeBg }};color:#fff">{{ trk.badge }}</span></sc-if>
             </div>
-            <sc-if value="{{ trk.hasWhen }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:{{ sky.muted }};margin-top:-4px">{{ trk.when }}</div></sc-if>
             <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.04;letter-spacing:-.02em;text-wrap:balance">{{ trk.head }}</div>
             <div style="font-size:16px;line-height:1.45;color:{{ sky.muted }};text-wrap:pretty">{{ trk.sub }}</div>
             <sc-if value="{{ trk.hasWx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;margin-top:2px;background:{{ sky.tile }};border-radius:999px;padding:2px 12px 2px 4px;width:max-content;max-width:100%"><img src="{{ trk.wxIcon }}" alt="" width="34" height="34" style="width:34px;height:34px;display:block;flex:none"><span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.wxLine }}</span></div></sc-if>
+            <sc-if value="{{ trk.hasLoc }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:{{ sky.muted }};min-width:0"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 21.5s-7-6.3-7-11.8a7 7 0 0 1 14 0c0 5.5-7 11.8-7 11.8z" fill="#B5452F"></path><circle cx="12" cy="9.7" r="2.6" fill="#FBF3E4"></circle></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.locLine }}</span></div></sc-if>
           </div>
           <div style="position:relative;width:clamp(72px,20vw,104px);height:clamp(72px,20vw,104px);flex:none;margin:6px 6px 0 0">{{ nowSticker }}
             <sc-for list="{{ nowExtras }}" as="nx" hint-placeholder-count="0"><img src="{{ nx.src }}" alt="" style="position:absolute;left:{{ nx.l }};top:{{ nx.t }};width:{{ nx.w }};height:{{ nx.w }};object-fit:contain;transform:rotate({{ nx.r }});filter:drop-shadow(0 3px 4px rgba(0,0,0,.18));pointer-events:none"></sc-for>
@@ -562,9 +562,9 @@ const P = {
   bkka: { airport: true, code: 'BKK', city: 'Bangkok', name: 'Bangkok Suvarnabhumi', ll: [13.69, 100.7501], tz: BKK, wx: 'bkk' },
   usma: { airport: true, code: 'USM', city: 'Koh Samui', name: 'Samui International', ll: [9.5478, 100.0623], tz: BKK, wx: 'usm' },
   cnxa: { airport: true, code: 'CNX', city: 'Chiang Mai', name: 'Chiang Mai International', ll: [18.7668, 98.9626], tz: BKK, wx: 'cnx' },
-  usm: { hotel: true, name: 'Conrad Koh Samui', place: 'Koh Samui', city: 'Koh Samui', ll: [9.429, 99.9277], tz: BKK, sticker: '32-pool-villa-resort', photo: PH('conrad-boat.jpg'), url: 'https://www.hilton.com/en/hotels/usmksci-conrad-koh-samui/', tel: '+6677915888', telLabel: '+66 77 915 888', address: '49/8-9 Hillcrest Road, Tambon Taling Ngam, Koh Samui, Surat Thani 84140', room: '2-bedroom ocean-view pool villa', cin: 'Check in Sun 3:00 PM', cout: 'Check out Thu morning', blurb: "Pool villas stacked up a jungle hillside on Samui's quiet southwest coast, with sunset views over the Five Islands." },
-  cnx: { hotel: true, name: 'Aleenta Retreat Chiang Mai', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.7935, 98.964], tz: BKK, sticker: 'r2-06-hotel-aleenta-chiang-mai', photo: PH('aleenta-pool.jpg'), url: 'https://www.aleenta.com/en/aleenta-retreat-chiang-mai', tel: '+6621808001', telLabel: '+66 2 180 8001', address: '189 Soi Ban Mai Lang Moo 18, Suthep, Mueang Chiang Mai, Chiang Mai 50200', room: '1-bedroom pool residence', cin: 'Check in Thu 12:00 PM', cout: 'Check out Mon 4:00 PM', blurb: 'A teak-and-courtyard wellness retreat at the foot of Doi Suthep, near the Nimman neighborhood.' },
-  bkk: { hotel: true, name: 'Waldorf Astoria Bangkok', place: 'Bangkok', city: 'Bangkok', ll: [13.7445, 100.5402], tz: BKK, sticker: 'r2-07-hotel-waldorf-astoria-bangkok', photo: PH('waldorf.jpg'), url: 'https://www.hilton.com/en/hotels/bkkwawa-waldorf-astoria-bangkok/', tel: '+6628468888', telLabel: '+66 2 846 8888', address: '151 Ratchadamri Road, Lumphini, Pathum Wan, Bangkok 10330', room: 'Deluxe king room', cin: 'Check in Mon 3:00 PM', cout: 'Check out Thu 4:00 PM', blurb: 'A slim, curvy glass tower on Ratchadamri Road overlooking the Royal Bangkok Sports Club, with a rooftop pool and bars up top.' },
+  usm: { hotel: true, name: 'Conrad Koh Samui', place: 'Koh Samui', city: 'Koh Samui', ll: [9.429, 99.9277], tz: BKK, sticker: '32-pool-villa-resort', photo: PH('conrad-boat.jpg'), url: 'https://www.hilton.com/en/hotels/usmksci-conrad-koh-samui/', tel: '+6677915888', telLabel: '+66 77 915 888', address: '49/8-9 Hillcrest Road, Tambon Taling Ngam, Koh Samui, Surat Thani 84140', room: '2-bedroom ocean-view pool villa', cin: 'Check in Sun', cout: 'Check out Thu', blurb: "Pool villas stacked up a jungle hillside on Samui's quiet southwest coast, with sunset views over the Five Islands." },
+  cnx: { hotel: true, name: 'Aleenta Retreat Chiang Mai', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.7935, 98.964], tz: BKK, sticker: 'r2-06-hotel-aleenta-chiang-mai', photo: PH('aleenta-pool.jpg'), url: 'https://www.aleenta.com/en/aleenta-retreat-chiang-mai', tel: '+6621808001', telLabel: '+66 2 180 8001', address: '189 Soi Ban Mai Lang Moo 18, Suthep, Mueang Chiang Mai, Chiang Mai 50200', room: '1-bedroom pool residence', cin: 'Check in Thu', cout: 'Check out Mon', blurb: 'A teak-and-courtyard wellness retreat at the foot of Doi Suthep, near the Nimman neighborhood.' },
+  bkk: { hotel: true, name: 'Waldorf Astoria Bangkok', place: 'Bangkok', city: 'Bangkok', ll: [13.7445, 100.5402], tz: BKK, sticker: 'r2-07-hotel-waldorf-astoria-bangkok', photo: PH('waldorf.jpg'), url: 'https://www.hilton.com/en/hotels/bkkwawa-waldorf-astoria-bangkok/', tel: '+6628468888', telLabel: '+66 2 846 8888', address: '151 Ratchadamri Road, Lumphini, Pathum Wan, Bangkok 10330', room: 'Deluxe king room', cin: 'Check in Mon', cout: 'Check out Thu', blurb: 'A slim, curvy glass tower on Ratchadamri Road overlooking the Royal Bangkok Sports Club, with a rooftop pool and bars up top.' },
   pups: { poi: true, sticker: 'r2-03-kona-rio', name: 'Kona & Rio', place: 'Yorkville, Illinois', city: 'Yorkville', ll: [41.585, -88.3], tz: CHI, wx: 'york', dates: 'The whole trip', blurb: 'Kona & Rio are staying with Grammy & Tim.' },
   ele: { poi: true, sticker: '15-elephant', label: 'Elephants', name: 'Elephant Nature Park', place: 'Chiang Mai', city: 'Chiang Mai', ll: [19.2156, 98.8592], tz: BKK, wx: 'cnx', dates: 'Fri Oct 23', blurb: 'Half-day morning visit. A guided walk with rescued elephants, then lunch at the park.' },
   doi: { poi: true, sticker: 'chedi', name: 'Wat Phra That Doi Suthep', place: 'Chiang Mai', city: 'Chiang Mai', ll: [18.8048, 98.9216], tz: BKK, wx: 'cnx', dates: 'Sat Oct 24, 9:00 AM', blurb: 'The golden temple on the mountain, first thing on TJ\'s birthday.' },
@@ -1116,7 +1116,7 @@ class Component extends DCLogic {
       } else { c.pos = along(drivePts(sg), f); c.tz = f < .5 ? P[sg.from].tz : P[sg.to].tz; }
     }
     const f = this.state.fix;
-    const lf = URL_NOW == null && f && t - f.ts < 3 * 3600000 && c.k !== 'flight' ? f : null;
+    const lf = URL_NOW == null && f && t - f.ts < 6 * 3600000 && c.k !== 'flight' ? f : null;
     if (lf) { c.live = lf; c.pos = [lf.lat, lf.lon]; if (inTHll(c.pos)) c.tz = BKK; }
     c.inTH = inTHll(c.pos);
     c.place = c.p || (c.k === 'flight' || c.k === 'drive' ? c.to : 'home');
@@ -1233,7 +1233,7 @@ class Component extends DCLogic {
         : { eyebrow: 'Right now', head: (c.p === 'usm' ? 'On ' : 'In ') + p.place, sub: 'Day ' + (Math.floor((t - Date.parse(new Date(c.s).toLocaleDateString('en-CA', { timeZone: p.tz }) + 'T00:00:00+07:00')) / 86400000) + 1) + ' at the ' + p.name + '.' });
     }
     if (c.live) {
-      tr.eyebrow = 'Live from ' + (c.live.who || 'our') + "'s phone"; tr.when = ago(st.now - c.live.ts);
+      const age = st.now - c.live.ts; tr.locLine = (age < 3600000 ? 'TJ & Kyle sharing location · ' : 'Last check-in · ') + ago(age);
       if (st.fixWx) wx = st.fixWx;
     }
     const rel = (tz, name) => { const d = Math.round((tzOff(c.tz, t) - tzOff(tz, t)) * 10) / 10; return d === 0 ? 'same time as ' + name : Math.abs(d) + (Math.abs(d) === 1 ? ' hr ' : ' hrs ') + (d > 0 ? 'ahead of ' : 'behind ') + name; };
@@ -1329,7 +1329,7 @@ class Component extends DCLogic {
     const mkStay = k => {
       const p = P[k], here = (c.k === 'stay' && c.p === k);
       const nights = SEGS.filter(sg => sg.k === 'stay' && sg.p === k).reduce((n, sg) => n + Math.round((sg.e - sg.s) / 86400000), 0);
-      const facts = p.hotel ? [p.room + ' · ' + nights + ' nights', p.cin, p.cout] : [tm(t, p.tz) + ' there · ' + wxStr(wxOf(k))];
+      const facts = p.hotel ? [p.room + ' · ' + nights + ' nights', p.cin + ' · ' + p.cout] : [tm(t, p.tz) + ' there · ' + wxStr(wxOf(k))];
       return { key: k, name: p.name, photo: p.photo || '', hasPhoto: !!p.photo, noPhoto: !p.photo, sticker: S(p.sticker), dates: stayRanges(k), blurb: p.blurb, facts, url: p.url || '', tel: p.tel ? 'tel:' + p.tel : '', maps: mapsUrl(p), wxUrl: wxUrl(p.city), here, border: here ? ACC : 'transparent', canCopy: !!p.address,
         copyLabel: st.copied === k ? 'Copied' : 'Copy address',
         copy: () => { const txt = p.name + ', ' + p.address; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).catch(() => {}); this.setState({ copied: k }); setTimeout(() => this.setState({ copied: null }), 2000); } };
@@ -1366,7 +1366,7 @@ class Component extends DCLogic {
       installText: st.canPrompt ? 'It opens full screen, like an app, and loads even when the signal is bad.' : ios ? (/CriOS|FxiOS|EdgiOS/.test(ua) ? "Tap the Share button, then Add to Home Screen. Use Safari if you don't see it." : 'In Safari, tap the Share button, then Add to Home Screen.') : 'Open your browser menu (⋮) and tap Install app or Add to Home screen.',
       doInstall: async () => { if (!this.bip) return; this.bip.prompt(); try { await this.bip.userChoice; } catch (e) {} this.bip = null; this.setState({ canPrompt: false }); },
       hideInstall: () => { ls.set('kt_install_hide', true); this.setState({ installHidden: true }); },
-      trk: Object.assign(tr, { showEyebrow: !!tr.eyebrow && tr.eyebrow !== 'Right now', hasWhen: !!tr.when, hasWx: !!wx, wxIcon: wxIcon(wx), wxLine: wx ? Math.round(wx.f) + '°F · ' + Math.round((wx.f - 32) * 5 / 9) + '°C · ' + WMO(wx.c) : '' }), sky, scene, nowSticker, nowExtras, clocks,
+      trk: Object.assign(tr, { showEyebrow: !!tr.eyebrow && tr.eyebrow !== 'Right now', hasLoc: !!tr.locLine, hasWx: !!wx, wxIcon: wxIcon(wx), wxLine: wx ? Math.round(wx.f) + '°F · ' + Math.round((wx.f - 32) * 5 / 9) + '°C · ' + WMO(wx.c) : '' }), sky, scene, nowSticker, nowExtras, clocks,
       hasAgenda: today.items.length > 0, today,
       hasStatus: !!(st.status && st.status.message), status: st.status ? { message: st.status.message, ago: st.status.updated ? ago(Date.now() - Date.parse(st.status.updated)) : 'recently' } : { message: '', ago: '' },
       liveLabel: URL_NOW != null ? 'Preview' : fresh ? 'Live' : 'On schedule',
