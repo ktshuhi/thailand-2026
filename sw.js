@@ -1,4 +1,4 @@
-const V = 'kt-trip-v7';
+const V = 'kt-trip-v8';
 const CORE = ['./', './index.html', './support.js', './manifest.webmanifest', './assets/stickers/barn.png', './assets/stickers/camera.png', './assets/stickers/chedi.png', './assets/stickers/curry.png', './assets/stickers/jeep.png', './assets/stickers/karst.png', './assets/stickers/moon.png', './assets/stickers/pizza.png', './assets/photos/aleenta.jpg', './assets/photos/conrad.jpg', './assets/photos/kona-rio.jpg', './assets/photos/kona.jpg', './assets/photos/kyle-tj-wrigley.jpg', './assets/photos/rio.jpg', './assets/photos/tj-kyle-beach.jpg', './assets/photos/waldorf.jpg', './assets/photos/yorkville-cartoon.jpg'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(CORE).catch(() => {}))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k))))); self.clients.claim(); });

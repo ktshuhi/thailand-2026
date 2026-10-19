@@ -272,7 +272,12 @@ nav::-webkit-scrollbar{display:none}
           <button onClick="{{ dayNext }}" aria-label="Next day" style="width:48px;height:48px;border-radius:50%;border:0;background:#5C3D24;color:#FFFFFF;font:800 22px Figtree,sans-serif;cursor:pointer;opacity:{{ dc.nextOp }}">›</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center">
-        <div ref="{{ dayMapRef }}" style="flex:1.2 1 320px;min-width:0;height:clamp(200px,48vw,300px);border-radius:16px;overflow:hidden;background:#9fd3e8;position:relative;z-index:0"></div>
+        <div style="flex:1.2 1 320px;min-width:0;height:clamp(200px,48vw,300px);position:relative">
+        <div ref="{{ dayMapRef }}" style="position:absolute;inset:0;border-radius:16px;overflow:hidden;background:#9fd3e8;z-index:0"></div>
+        <sc-if value="{{ dc.done }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:12px;right:12px;z-index:1;pointer-events:none;transform:rotate(-12deg);border:3px solid oklch(0.5 0.11 150);color:oklch(0.5 0.11 150);border-radius:12px;padding:4px 10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;background:rgba(255,253,248,.92);box-shadow:0 2px 6px rgba(0,0,0,.18)">✓ {{ dc.stamp }}</div>
+        </sc-if>
+        </div>
         <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;gap:6px;align-items:center;justify-content:flex-start;flex-wrap:wrap">
           <span style="font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7A4B26">{{ dc.where }}</span>
@@ -290,9 +295,6 @@ nav::-webkit-scrollbar{display:none}
         </div>
         </div>
         </div>
-        <sc-if value="{{ dc.done }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;top:84px;right:22px;z-index:500;transform:rotate(-12deg);border:3px solid oklch(0.5 0.11 150);color:oklch(0.5 0.11 150);border-radius:12px;padding:4px 10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;background:rgba(255,253,248,.92)">✓ {{ dc.stamp }}</div>
-        </sc-if>
       </div></sc-if>
       </div>
     </section>
