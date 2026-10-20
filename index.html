@@ -584,8 +584,9 @@ const RAW = [
   { k: 'stay', p: 'usm', e: '2026-10-22T07:30+07:00' },
   { k: 'airport', p: 'usma', e: '2026-10-22T08:55+07:00' },
   { k: 'flight', from: 'usma', to: 'cnxa', air: 'Bangkok Airways', num: 'PG 241', cs: 'BKP241', e: '2026-10-22T10:40+07:00' },
-  { k: 'stay', p: 'cnx', e: '2026-10-26T12:00+07:00' },
-  { k: 'flight', from: 'cnxa', to: 'bkka', tbd: true, air: 'Chiang Mai to Bangkok', e: '2026-10-26T15:00+07:00' },
+  { k: 'stay', p: 'cnx', e: '2026-10-26T13:45+07:00' },
+  { k: 'airport', p: 'cnxa', e: '2026-10-26T15:25+07:00' },
+  { k: 'flight', from: 'cnxa', to: 'bkka', air: 'Thai Airways', num: 'TG 111', cs: 'THA111', e: '2026-10-26T16:45+07:00' },
   { k: 'stay', p: 'bkk', e: '2026-10-29T14:00+07:00' },
   { k: 'airport', p: 'bkka', e: '2026-10-29T17:15+07:00' },
   { k: 'flight', from: 'bkka', to: 'tpe', air: 'EVA Air', num: 'BR 68', cs: 'EVA68', e: '2026-10-29T21:50+08:00' },
@@ -617,7 +618,7 @@ const DAYS = [
   { d: '2026-10-23', off: '+07:00', where: 'Chiang Mai', title: 'Elephant day', p: 'ele', star: true, stamp: 'Elephants', items: [['2026-10-23T07:30+07:00', '7:30 to 8:00 AM: Pickup at the Aleenta for Elephant Nature Park'], [null, 'Guided walk with the elephants'], ['2026-10-23T12:00+07:00', '12:00 PM: Lunch at the park'], ['2026-10-23T14:00+07:00', '2:00 to 2:30 PM: Back at the Aleenta'], ['2026-10-23T19:00+07:00', '7:00 PM: Dinner and a night market stroll']] },
   { d: '2026-10-24', off: '+07:00', where: 'Chiang Mai', title: "TJ's birthday!", p: 'blk', star: true, stamp: 'Happy birthday', items: [['2026-10-24T09:00+07:00', '9:00 AM: Wat Phra That Doi Suthep, the golden temple on the mountain'], ['2026-10-24T17:00+07:00', "5:00 PM: TJ's birthday dinner, 12 courses at Blackitch Artisan Kitchen"]] },
   { d: '2026-10-25', off: '+07:00', where: 'Chiang Mai', title: 'Temples and markets', p: 'wsm', items: [['2026-10-25T10:00+07:00', '10:00 AM: Old City temples, Wat Chedi Luang'], ['2026-10-25T17:00+07:00', '5:00 PM: Sunday Walking Street night market at Tha Phae Gate']] },
-  { d: '2026-10-26', off: '+07:00', where: 'Chiang Mai to Bangkok', title: 'On to the last leg', p: 'bkk', items: [['2026-10-26T12:00+07:00', '12:00 PM: Check out of the Aleenta (late check-out to 4 PM if available)'], [null, 'Fly to Bangkok (flight number coming soon)'], ['2026-10-26T15:00+07:00', '3:00 PM: Check in at the Waldorf Astoria'], ['2026-10-26T19:00+07:00', '7:00 PM: Street food night in Chinatown (Yaowarat)']] },
+  { d: '2026-10-26', off: '+07:00', where: 'Chiang Mai to Bangkok', title: 'On to the last leg', p: 'bkk', items: [['2026-10-26T12:00+07:00', '12:00 PM: Check out of the Aleenta (late check-out to 4 PM if available)'], ['2026-10-26T15:25+07:00', '3:25 PM: Thai Airways 111 to Bangkok'], ['2026-10-26T16:45+07:00', '4:45 PM: Land in Bangkok'], [null, 'Check in at the Waldorf Astoria'], ['2026-10-26T19:00+07:00', '7:00 PM: Street food night in Chinatown (Yaowarat)']] },
   { d: '2026-10-27', off: '+07:00', where: 'Bangkok', title: 'Shop and sip', p: 'mall', items: [['2026-10-27T12:00+07:00', '12:00 PM: Mall day (probably CentralWorld, near the Waldorf)'], ['2026-10-27T18:00+07:00', '6:00 PM: Rooftop bar for sunset']] },
   { d: '2026-10-28', off: '+07:00', where: 'Bangkok', title: 'Tattoo day', p: 'tat', star: true, stamp: 'Inked', items: [['2026-10-28T12:00+07:00', '12:00 PM: TJ and Kyle both plan to get tattoos at All Day Tattoo, a highly regarded shop on Sukhumvit Soi 47'], [null, 'Last night in Bangkok']] },
   { d: '2026-10-29', off: '-07:00', where: 'Bangkok to LA', title: 'The long way home', p: 'lax', items: [[null, 'Check out of the Waldorf'], ['2026-10-29T14:00+07:00', '2:00 PM: Leave for the airport'], ['2026-10-29T17:15+07:00', '5:15 PM: EVA 68 to Taipei'], ['2026-10-29T23:55+08:00', '11:55 PM Taipei: EVA 16 to LA'], ['2026-10-29T20:35-07:00', '8:35 PM PT: Land in LA'], ['2026-10-29T23:59-07:00', '11:59 PM PT: Delta 430 to Minneapolis']] },
@@ -722,7 +723,7 @@ function gc(p, q, f) {
 }
 function destPt([la, lo], brgDeg, dKm) { const R = 6371, d = dKm / R, b = brgDeg * D, p1 = la * D, l1 = lo * D; const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(b)); const l2 = l1 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2)); return [p2 / D, ((l2 / D + 540) % 360) - 180]; }
 function isWest(a, b) { const n = gc(a, b, 0.02); let d = n[1] - a[1]; if (d > 180) d -= 360; if (d < -180) d += 360; return d < 0; }
-const planeKey = air => /Bangkok Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+const planeKey = air => /Bangkok Airways|Thai Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
 const DAY_WEST = { '2026-10-16': true, '2026-10-17': true };
 function km(p, q) { const a = Math.sin((q[0] - p[0]) * D / 2) ** 2 + Math.cos(p[0] * D) * Math.cos(q[0] * D) * Math.sin((q[1] - p[1]) * D / 2) ** 2; return 12742 * Math.asin(Math.sqrt(a)); }
 function along(pts, f) {
@@ -1269,7 +1270,7 @@ class Component extends DCLogic {
       skyLine,
     });
 
-    const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
+    const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways|Thai Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
       : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
     const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
     const nowSticker = fun ? (fun.sticker ? React.createElement('img', { key: 'fun', src: S(fun.sticker), alt: '', style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'rotate(4deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } }) : null) : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
@@ -1345,7 +1346,7 @@ class Component extends DCLogic {
     const flSegs = SEGS.filter(sg => sg.k === 'flight');
     const flights = flSegs.filter(sg => t < sg.e).map(sg => {
       const a = P[sg.from], b = P[sg.to], flying = t >= sg.s && t < sg.e, soon = !flying && !sg.tbd && sg.s - t < 3 * 3600000;
-      const pk = sg.tbd || /Bangkok Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+      const pk = sg.tbd || /Bangkok Airways|Thai Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
       return { sticker: S(pk), flip: isWest(a.ll, b.ll) ? 'scaleX(-1)' : 'none', route: a.city + ' → ' + b.city, title: sg.tbd ? 'Details coming soon' : sg.air + ' ' + sg.num.split(' ')[1], when: sg.tbd ? 'Mon, Oct 26' : dy(sg.s, a.tz) + ' · ' + tm(sg.s, a.tz),
         flying, pct: flying ? Math.round((t - sg.s) / (sg.e - sg.s) * 100) : 0,
         status: flying ? 'In the air' : soon ? 'Soon' : sg.tbd ? 'TBD' : 'Track ↗', statusBg: flying ? 'oklch(0.58 0.11 225)' : soon ? 'oklch(0.9 0.08 75)' : '#F4E9D6', statusInk: flying ? '#fff' : '#1F2A33',
