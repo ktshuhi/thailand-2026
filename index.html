@@ -535,7 +535,7 @@ const ACC = 'oklch(0.58 0.11 35)', SEA = 'oklch(0.58 0.11 225)', GO = 'oklch(0.5
 const BKK = 'Asia/Bangkok', CHI = 'America/Chicago', NYC = 'America/New_York', LAX = 'America/Los_Angeles', TPE = 'Asia/Taipei';
 const ZL = { [BKK]: 'Bangkok time', [TPE]: 'Taipei time', [CHI]: 'Chicago time', [LAX]: 'LA time', [NYC]: 'New England time' };
 const NOW_ART = {
-  delta: ['r2-08-plane-delta-heads', 'r2-08-plane-delta'], eva: ['r2-09-plane-eva-air-heads', 'r2-09-plane-eva-air'], pg: ['r2-10-plane-bangkok-airways-heads', 'r2-10-plane-bangkok-airways'],
+  delta: ['r2-08-plane-delta-heads', 'r2-08-plane-delta'], eva: ['r2-09-plane-eva-air-heads', 'r2-09-plane-eva-air'], pg: ['r2-10-plane-bangkok-airways-heads', 'r2-10-plane-bangkok-airways'], tg: ['r2-25-plane-thai-airways-heads', 'r2-25-plane-thai-airways'],
   lax: ['r2-17-la-palms-sunset', 'r2-17-la-palms-sunset'], tpe: ['r2-18-taipei-101', 'r2-18-taipei-101'], ord: ['r2-11-chicago-skyline', 'r2-11-chicago-skyline'], msp: ['r2-08-plane-delta', 'r2-08-plane-delta'],
   bkka: ['05-thai-flag', 'curry'], usma: ['05-thai-flag', 'karst'], cnxa: ['05-thai-flag', 'chedi'],
   york: ['r2-05-grammy-tims-house', 'barn'], usm: ['32-pool-villa-resort', 'karst'], cnx: ['r2-06-hotel-aleenta-chiang-mai', 'chedi'], bkk: ['r2-07-hotel-waldorf-astoria-bangkok', 'curry'],
@@ -723,7 +723,7 @@ function gc(p, q, f) {
 }
 function destPt([la, lo], brgDeg, dKm) { const R = 6371, d = dKm / R, b = brgDeg * D, p1 = la * D, l1 = lo * D; const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(b)); const l2 = l1 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2)); return [p2 / D, ((l2 / D + 540) % 360) - 180]; }
 function isWest(a, b) { const n = gc(a, b, 0.02); let d = n[1] - a[1]; if (d > 180) d -= 360; if (d < -180) d += 360; return d < 0; }
-const planeKey = air => /Bangkok Airways|Thai Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+const planeKey = air => /Thai Airways/.test(air || '') ? 'r2-25-plane-thai-airways' : /Bangkok Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
 const DAY_WEST = { '2026-10-16': true, '2026-10-17': true };
 function km(p, q) { const a = Math.sin((q[0] - p[0]) * D / 2) ** 2 + Math.cos(p[0] * D) * Math.cos(q[0] * D) * Math.sin((q[1] - p[1]) * D / 2) ** 2; return 12742 * Math.asin(Math.sqrt(a)); }
 function along(pts, f) {
@@ -1270,7 +1270,7 @@ class Component extends DCLogic {
       skyLine,
     });
 
-    const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways|Thai Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
+    const artKey = c.k === 'flight' ? (/Thai Airways/.test(c.air) ? 'tg' : c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
       : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
     const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
     const nowSticker = fun ? (fun.sticker ? React.createElement('img', { key: 'fun', src: S(fun.sticker), alt: '', style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'rotate(4deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } }) : null) : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
@@ -1346,7 +1346,7 @@ class Component extends DCLogic {
     const flSegs = SEGS.filter(sg => sg.k === 'flight');
     const flights = flSegs.filter(sg => t < sg.e).map(sg => {
       const a = P[sg.from], b = P[sg.to], flying = t >= sg.s && t < sg.e, soon = !flying && !sg.tbd && sg.s - t < 3 * 3600000;
-      const pk = sg.tbd || /Bangkok Airways|Thai Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
+      const pk = /Thai Airways/.test(sg.air) ? 'r2-25-plane-thai-airways' : sg.tbd || /Bangkok Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
       return { sticker: S(pk), flip: isWest(a.ll, b.ll) ? 'scaleX(-1)' : 'none', route: a.city + ' → ' + b.city, title: sg.tbd ? 'Details coming soon' : sg.air + ' ' + sg.num.split(' ')[1], when: sg.tbd ? 'Mon, Oct 26' : dy(sg.s, a.tz) + ' · ' + tm(sg.s, a.tz),
         flying, pct: flying ? Math.round((t - sg.s) / (sg.e - sg.s) * 100) : 0,
         status: flying ? 'In the air' : soon ? 'Soon' : sg.tbd ? 'TBD' : 'Track ↗', statusBg: flying ? 'oklch(0.58 0.11 225)' : soon ? 'oklch(0.9 0.08 75)' : '#F4E9D6', statusInk: flying ? '#fff' : '#1F2A33',
