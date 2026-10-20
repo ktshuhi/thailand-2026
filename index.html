@@ -149,14 +149,22 @@ nav::-webkit-scrollbar{display:none}
               <sc-if value="{{ trk.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 8px;background:{{ trk.badgeBg }};color:#fff">{{ trk.badge }}</span></sc-if>
               <sc-if value="{{ trk.hasLoc }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:{{ sky.muted }};white-space:nowrap;min-width:0"><sc-if value="{{ trk.locLive }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position:relative;width:7px;height:7px;flex:none"><span style="position:absolute;inset:0;border-radius:50%;background:#2FA36B;animation:ktpulse 1.8s ease-out infinite"></span><span style="position:absolute;inset:0;border-radius:50%;background:#2FA36B"></span></span></sc-if><sc-if value="{{ trk.locOld }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 21.5s-7-6.3-7-11.8a7 7 0 0 1 14 0c0 5.5-7 11.8-7 11.8z" fill="#B5452F"></path><circle cx="12" cy="9.7" r="2.6" fill="#FBF3E4"></circle></svg></sc-if><span style="overflow:hidden;text-overflow:ellipsis">{{ trk.locLine }}</span></span></sc-if>
             </div>
+            <sc-if value="{{ trk.hasStamp }}" hint-placeholder-val="{{ false }}">
+              <svg width="0" height="0" aria-hidden="true" style="position:absolute"><filter id="kt-grunge"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="7" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.75" result="m"></feColorMatrix><feComposite in="SourceGraphic" in2="m" operator="in"></feComposite></filter></svg>
+            </sc-if>
             <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.04;letter-spacing:-.02em;text-wrap:balance">{{ trk.head }}</div>
             <div style="font-size:16px;line-height:1.45;color:{{ sky.muted }};text-wrap:pretty">{{ trk.sub }}</div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px"><sc-if value="{{ trk.hasWx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};transition:background 1.2s ease,color 1.2s ease;border-radius:999px;height:34px;padding:0 12px 0 4px;max-width:100%;min-width:0"><img src="{{ trk.wxIcon }}" alt="" width="30" height="30" style="width:30px;height:30px;display:block;flex:none"><span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.wxLine }}</span></div></sc-if></div>
           </div>
           <div style="position:relative;width:clamp(72px,20vw,104px);height:clamp(72px,20vw,104px);flex:none;margin:6px 6px 0 0">{{ nowSticker }}
+            <sc-if value="{{ trk.hasStamp }}" hint-placeholder-val="{{ false }}"><div role="img" aria-label="{{ trk.stamp }}" style="position:absolute;right:-4px;top:8px;transform:rotate(-12deg);border:4px solid #E0342A;border-radius:10px;padding:4px 10px 3px;color:#E0342A;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(17px,4.6vw,22px);letter-spacing:.06em;text-transform:uppercase;line-height:1.05;text-align:center;white-space:nowrap;text-shadow:none;filter:url(#kt-grunge)">Incident<br>Report</div></sc-if>
             <sc-for list="{{ nowExtras }}" as="nx" hint-placeholder-count="0"><img src="{{ nx.src }}" alt="" style="position:absolute;left:{{ nx.l }};top:{{ nx.t }};width:{{ nx.w }};height:{{ nx.w }};object-fit:contain;transform:rotate({{ nx.r }});filter:drop-shadow(0 3px 4px rgba(0,0,0,.18));pointer-events:none"></sc-for>
           </div>
         </div>
+
+        <sc-if value="{{ trk.hasStory }}" hint-placeholder-val="{{ false }}">
+          <div style="background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};border-radius:18px;padding:14px 16px;font-family:'Courier New',ui-monospace,monospace;font-size:15px;line-height:1.55;text-wrap:pretty">{{ trk.story }}</div>
+        </sc-if>
 
         <sc-if value="{{ trk.showProgress }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -192,8 +200,17 @@ nav::-webkit-scrollbar{display:none}
         <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ false }}">
           <div style="background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};transition:background 1.2s ease,color 1.2s ease;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:4px">
-              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.pillMuted }}">On the agenda today · {{ today.title }}</div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ sky.pillMuted }}">{{ today.label }} · {{ today.title }}</div>
             </div>
+            <sc-for list="{{ today.struck }}" as="sx" hint-placeholder-count="0">
+              <div style="display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:7px 8px;margin:0 -8px">
+                <span style="width:8px;height:8px;border-radius:50%;margin:8px 0 0 7px;background:#B5452F"></span>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="font-size:15px;line-height:1.35;font-weight:500;text-decoration:line-through;opacity:.55">{{ sx.text }}</span>
+                  <span style="font-size:13px;line-height:1.35;font-weight:600;font-style:italic;color:#C9503A">{{ sx.note }}</span>
+                </div>
+              </div>
+            </sc-for>
             <sc-for list="{{ today.items }}" as="ai" hint-placeholder-count="3">
               <div style="display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:7px 8px;margin:0 -8px;border-radius:12px;background:{{ ai.bg }}">
                 <span style="width:8px;height:8px;border-radius:50%;margin:8px 0 0 7px;background:{{ ai.ring }}"></span>
@@ -202,6 +219,7 @@ nav::-webkit-scrollbar{display:none}
                 </div>
               </div>
             </sc-for>
+            <sc-if value="{{ today.hasSignoff }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;font-weight:600;font-style:italic;color:{{ sky.pillMuted }};text-align:center;padding-top:8px;margin-top:6px;border-top:1px dashed currentColor">{{ today.signoff }}</div></sc-if>
           </div>
         </sc-if>
 
@@ -587,7 +605,8 @@ const DAYS = [
   { d: '2026-10-18', off: '+07:00', where: 'Bangkok to Koh Samui', title: 'Hello, Thailand!', p: 'usm', stamp: 'Arrived', items: [['2026-10-18T05:45+08:00', '5:45 AM Taipei: Land in Taipei'], ['2026-10-18T08:20+08:00', '8:20 AM Taipei: EVA 211 to Bangkok'], ['2026-10-18T11:10+07:00', '11:10 AM: Land in Bangkok'], ['2026-10-18T14:40+07:00', '2:40 PM: Bangkok Airways 151 to Koh Samui'], ['2026-10-18T15:45+07:00', '3:45 PM: Land on Koh Samui'], [null, 'Check in to the Conrad pool villa']] },
   { d: '2026-10-19', off: '+07:00', where: 'Koh Samui', title: 'First full day on Koh Samui', star: true, p: 'usm', items: [[null, 'Still adjusting to the time zone, 11 hours ahead of home'], [null, 'Sunrise on the ocean'], [null, 'Thai coffee'], ['2026-10-19T07:20+07:00', '7:20 AM: Cowboys vs. Packers'], [null, 'Pool day']] },
   { d: '2026-10-20', off: '+07:00', where: 'Koh Samui', title: 'Jet skis & villa BBQ', p: 'usm', items: [[null, 'Jet skis around the Five Islands'], [null, 'Private BBQ in our villa with our own chef, out on the terrace under the stars'], [null, 'Premium cuts and fresh local seafood off the grill']] },
-  { d: '2026-10-21', off: '+07:00', where: 'Koh Samui', title: 'Last island day', p: 'usm', items: [[null, 'Massages at the Conrad Spa'], [null, 'Samui Embrace sounds great for TJ'], [null, 'Coffee roasting experience'], [null, 'Dinner at Jahn at the Conrad']] },
+  { d: '2026-10-21', off: '+07:00', where: 'Koh Samui', title: 'Last island day', p: 'usm', items: [[null, 'Pool day, minimal movement'], [null, 'Dinner at Jahn (under review)']],
+    fun: { stamp: 'Incident report', head: 'Food Coma, Koh Samui', sub: 'Day 4 at the Conrad. Recovery in progress.', story: 'Due to a minor language barrier, we accidentally ordered 10 entrées from our private chef last night. The endless sides followed. Nobody intervened. We are struggling.', planLabel: 'Corrective action plan', struck: [{ text: 'Massages at the Conrad Spa', note: 'Postponed. Lying face down is not an option.' }, { text: 'Coffee roasting experience', note: 'Corrected: Thai coffee delivered to the room.' }] } },
   { d: '2026-10-22', off: '+07:00', where: 'Koh Samui to Chiang Mai', title: 'North to the mountains', p: 'cnx', items: [[null, 'Early check-out from the Conrad'], ['2026-10-22T08:55+07:00', '8:55 AM: Bangkok Airways 241 to Chiang Mai'], ['2026-10-22T10:40+07:00', '10:40 AM: Land in Chiang Mai'], ['2026-10-22T15:00+07:00', '3:00 PM: Check in at the Aleenta (12:00 PM if the room is ready)'], ['2026-10-22T19:00+07:00', '7:00 PM: Chiang Mai Night Bazaar']] },
   { d: '2026-10-23', off: '+07:00', where: 'Chiang Mai', title: 'Elephant day', p: 'ele', star: true, stamp: 'Elephants', items: [['2026-10-23T07:30+07:00', '7:30 to 8:00 AM: Pickup at the Aleenta for Elephant Nature Park'], [null, 'Guided walk with the elephants'], ['2026-10-23T12:00+07:00', '12:00 PM: Lunch at the park'], ['2026-10-23T14:00+07:00', '2:00 to 2:30 PM: Back at the Aleenta'], ['2026-10-23T19:00+07:00', '7:00 PM: Dinner and a night market stroll']] },
   { d: '2026-10-24', off: '+07:00', where: 'Chiang Mai', title: "TJ's birthday!", p: 'blk', star: true, stamp: 'Happy birthday', items: [['2026-10-24T09:00+07:00', '9:00 AM: Wat Phra That Doi Suthep, the golden temple on the mountain'], ['2026-10-24T17:00+07:00', "5:00 PM: TJ's birthday dinner, 12 courses at Blackitch Artisan Kitchen"]] },
@@ -1227,6 +1246,11 @@ class Component extends DCLogic {
         ? { eyebrow: 'Right now', head: "At Grammy & Tim's", sub: t > Date.parse('2026-10-30T00:00-05:00') ? 'Back in Yorkville with Kona and Rio!' : 'Family time in Yorkville. Kona and Rio are settling in.' }
         : { eyebrow: 'Right now', head: (c.p === 'usm' ? 'On ' : 'In ') + p.place, sub: 'Day ' + (Math.floor((t - Date.parse(new Date(c.s).toLocaleDateString('en-CA', { timeZone: p.tz }) + 'T00:00:00+07:00')) / 86400000) + 1) + ' at the ' + p.name + '.' });
     }
+    const funDay = DAYS[this.todayIdx(t)];
+    const fun = funDay && funDay.fun && !['before', 'after', 'homeday', 'drive', 'flight', 'airport'].includes(c.k) ? funDay.fun : null;
+    if (fun) Object.assign(tr, { head: fun.head, sub: fun.sub });
+    tr.stamp = fun ? fun.stamp : ''; tr.hasStamp = !!tr.stamp;
+    tr.story = fun ? fun.story : ''; tr.hasStory = !!tr.story;
     if (c.live) {
       const age = st.now - c.live.ts; const live = age < 3600000; tr.locLive = live; tr.locOld = !live; tr.locLine = (live ? 'TJ & Kyle · ' : 'Last check-in · ') + ago(age);
       if (st.fixWx) wx = st.fixWx;
@@ -1241,18 +1265,18 @@ class Component extends DCLogic {
     const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
       : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
     const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
-    const nowSticker = React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
+    const nowSticker = fun ? null : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
 
     const ti = this.todayIdx(t);
     const todayDay = ti >= 0 ? DAYS[ti] : null;
     const NX_POS = [{ l: '-34%', t: '62%', w: '50%', r: '-10deg' }, { l: '70%', t: '-16%', w: '42%', r: '12deg' }, { l: '76%', t: '74%', w: '38%', r: '-6deg' }];
-    const nowExtras = [...new Set((todayDay ? DAY_STK[todayDay.d] || [] : []).concat([art[1]]))].filter(n => n && n !== art[0]).slice(0, 3).map((n, i) => Object.assign({ src: S(n) }, NX_POS[i]));
-    let today = { title: '', items: [], count: '' };
+    const nowExtras = fun ? [] : [...new Set((todayDay ? DAY_STK[todayDay.d] || [] : []).concat([art[1]]))].filter(n => n && n !== art[0]).slice(0, 3).map((n, i) => Object.assign({ src: S(n) }, NX_POS[i]));
+    let today = { title: '', items: [], count: '', label: 'On the agenda today', struck: [], hasStruck: false, signoff: '', hasSignoff: false };
     if (todayDay) {
       const ds = this.dayStatus(todayDay, t);
       const nextI = ds.items.findIndex(x => !x.done && x.at != null);
       const firstOpen = ds.items.findIndex(x => !x.done);
-      today = { title: todayDay.title, count: ds.items.filter(x => x.done).length + ' of ' + ds.items.length + ' done',
+      today = { title: todayDay.title, label: fun ? fun.planLabel : 'On the agenda today', struck: fun ? fun.struck : [], hasStruck: !!(fun && fun.struck.length), signoff: fun ? fun.signoff || '' : '', hasSignoff: !!(fun && fun.signoff), count: ds.items.filter(x => x.done).length + ' of ' + ds.items.length + ' done',
         items: ds.items.map((x, i) => {
           const isNext = i === nextI && x.at != null;
           return { text: x.text, mark: x.done ? '✓' : '', fill: x.done ? GO : 'transparent', ring: sky.pillMuted || (phase === 'night' ? '#8C97A5' : '#9AA3AC'), op: 1, weight: 500, bg: 'transparent', isNext, inText: isNext ? 'in ' + dur(x.at - t) : '' };
