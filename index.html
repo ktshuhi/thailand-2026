@@ -156,14 +156,13 @@ nav::-webkit-scrollbar{display:none}
             <div style="font-size:16px;line-height:1.45;color:{{ sky.muted }};text-wrap:pretty">{{ trk.sub }}</div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px"><sc-if value="{{ trk.hasWx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};transition:background 1.2s ease,color 1.2s ease;border-radius:999px;height:34px;padding:0 12px 0 4px;max-width:100%;min-width:0"><img src="{{ trk.wxIcon }}" alt="" width="30" height="30" style="width:30px;height:30px;display:block;flex:none"><span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ trk.wxLine }}</span></div></sc-if></div>
           </div>
-          <div style="position:relative;width:clamp(72px,20vw,104px);height:clamp(72px,20vw,104px);flex:none;margin:6px 6px 0 0">{{ nowSticker }}
-            <sc-if value="{{ trk.hasStamp }}" hint-placeholder-val="{{ false }}"><div role="img" aria-label="{{ trk.stamp }}" style="position:absolute;right:-4px;top:8px;transform:rotate(-12deg);border:4px solid #E0342A;border-radius:10px;padding:4px 10px 3px;color:#E0342A;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(17px,4.6vw,22px);letter-spacing:.06em;text-transform:uppercase;line-height:1.05;text-align:center;white-space:nowrap;text-shadow:none;filter:url(#kt-grunge)">Incident<br>Report</div></sc-if>
+          <div style="position:relative;width:{{ trk.artW }};height:{{ trk.artH }};flex:none;margin:{{ trk.artM }}">{{ nowSticker }}
             <sc-for list="{{ nowExtras }}" as="nx" hint-placeholder-count="0"><img src="{{ nx.src }}" alt="" style="position:absolute;left:{{ nx.l }};top:{{ nx.t }};width:{{ nx.w }};height:{{ nx.w }};object-fit:contain;transform:rotate({{ nx.r }});filter:drop-shadow(0 3px 4px rgba(0,0,0,.18));pointer-events:none"></sc-for>
           </div>
         </div>
 
         <sc-if value="{{ trk.hasStory }}" hint-placeholder-val="{{ false }}">
-          <div style="background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};border-radius:18px;padding:14px 16px;font-family:'Courier New',ui-monospace,monospace;font-size:15px;line-height:1.55;text-wrap:pretty">{{ trk.story }}</div>
+          <div style="background:{{ sky.tile }};color:{{ sky.pillInk }};backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none;box-shadow:{{ sky.edge }};border-radius:18px;padding:12px 16px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:8px"><sc-if value="{{ trk.hasStamp }}" hint-placeholder-val="{{ false }}"><div role="img" aria-label="{{ trk.stamp }}" style="transform:rotate(-3deg);border:2px solid #E0342A;border-radius:6px;padding:2px 8px 1px;color:#E0342A;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;line-height:1.2;white-space:nowrap;filter:url(#kt-grunge)">{{ trk.stamp }}</div></sc-if><div style="font-family:'Courier New',ui-monospace,monospace;font-size:15px;line-height:1.55;text-wrap:pretty">{{ trk.story }}</div></div>
         </sc-if>
 
         <sc-if value="{{ trk.showProgress }}" hint-placeholder-val="{{ false }}">
@@ -270,7 +269,7 @@ nav::-webkit-scrollbar{display:none}
           <sc-for list="{{ cal }}" as="cd" hint-placeholder-count="28">
             <button onClick="{{ cd.go }}" disabled="{{ cd.empty }}" aria-label="{{ cd.label }}" style="position:relative;min-height:clamp(48px,13vw,82px);border:2px solid {{ cd.ring }};border-radius:12px;background:{{ cd.bg }};color:{{ cd.ink }};cursor:pointer;padding:5px 4px 4px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;overflow:hidden;font:inherit;text-align:left;box-shadow:{{ cd.shadow }}">
               <span style="font:800 clamp(13px,3.6vw,18px) 'Bricolage Grotesque',sans-serif;line-height:1">{{ cd.num }}</span>
-              <sc-if value="{{ cd.stk }}" hint-placeholder-val="{{ false }}"><img src="{{ cd.stk }}" alt="" style="position:absolute;right:2px;bottom:2px;width:clamp(20px,6vw,40px);height:clamp(20px,6vw,40px);object-fit:contain;opacity:{{ cd.stkOp }}"></sc-if>
+              <sc-if value="{{ cd.stk }}" hint-placeholder-val="{{ false }}"><img src="{{ cd.stk }}" alt="" style="position:absolute;right:2px;top:{{ cd.stkT }};bottom:{{ cd.stkB }};width:{{ cd.stkW }};height:{{ cd.stkH }};object-fit:contain;opacity:{{ cd.stkOp }}"></sc-if>
               <span style="font:800 9px Figtree,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:{{ cd.markInk }};position:relative">{{ cd.mark }}</span>
             </button>
           </sc-for>
@@ -613,7 +612,7 @@ const DAYS = [
   { d: '2026-10-19', off: '+07:00', where: 'Koh Samui', title: 'First full day on Koh Samui', star: true, p: 'usm', items: [[null, 'Still adjusting to the time zone, 11 hours ahead of home'], [null, 'Sunrise on the ocean'], [null, 'Thai coffee'], ['2026-10-19T07:20+07:00', '7:20 AM: Cowboys vs. Packers'], [null, 'Pool day']] },
   { d: '2026-10-20', off: '+07:00', where: 'Koh Samui', title: 'Jet skis & villa BBQ', p: 'usm', items: [[null, 'Jet skis around the Five Islands'], [null, 'Private BBQ in our villa with our own chef, out on the terrace under the stars'], [null, 'Premium cuts and fresh local seafood off the grill']] },
   { d: '2026-10-21', off: '+07:00', where: 'Koh Samui', title: 'Last island day', p: 'usm', items: [[null, 'Pool day, minimal movement'], [null, 'Dinner at Jahn (under review)']],
-    fun: { stamp: 'Incident report', head: 'Food Coma, Koh Samui', sub: 'Day 4 at the Conrad. Recovery in progress.', story: 'Due to a minor language barrier, we accidentally ordered 10 entrées from our private chef last night. The endless sides followed. Nobody intervened. We are struggling.', planLabel: 'Corrective action plan', struck: [{ text: 'Massages at the Conrad Spa', note: 'Postponed. Lying face down is not an option.' }, { text: 'Coffee roasting experience', note: 'Corrected: Thai coffee delivered to the room.' }] } },
+    fun: { stamp: 'Incident report', head: 'Food Coma, Koh Samui', sub: 'Day 4 at the Conrad. Recovery in progress.', story: 'Due to a minor language barrier, we accidentally ordered 10 entrées from our private chef last night. The endless sides followed. Nobody intervened. We are struggling.', planLabel: 'Corrective action plan', sticker: 'r2-24-food-coma', struck: [{ text: 'Massages at the Conrad Spa', note: 'Postponed. Lying face down is not an option.' }, { text: 'Coffee roasting experience', note: 'Corrected: Thai coffee delivered to the room.' }] } },
   { d: '2026-10-22', off: '+07:00', where: 'Koh Samui to Chiang Mai', title: 'North to the mountains', p: 'cnx', items: [[null, 'Early check-out from the Conrad'], ['2026-10-22T08:55+07:00', '8:55 AM: Bangkok Airways 241 to Chiang Mai'], ['2026-10-22T10:40+07:00', '10:40 AM: Land in Chiang Mai'], ['2026-10-22T15:00+07:00', '3:00 PM: Check in at the Aleenta (12:00 PM if the room is ready)'], ['2026-10-22T19:00+07:00', '7:00 PM: Chiang Mai Night Bazaar']] },
   { d: '2026-10-23', off: '+07:00', where: 'Chiang Mai', title: 'Elephant day', p: 'ele', star: true, stamp: 'Elephants', items: [['2026-10-23T07:30+07:00', '7:30 to 8:00 AM: Pickup at the Aleenta for Elephant Nature Park'], [null, 'Guided walk with the elephants'], ['2026-10-23T12:00+07:00', '12:00 PM: Lunch at the park'], ['2026-10-23T14:00+07:00', '2:00 to 2:30 PM: Back at the Aleenta'], ['2026-10-23T19:00+07:00', '7:00 PM: Dinner and a night market stroll']] },
   { d: '2026-10-24', off: '+07:00', where: 'Chiang Mai', title: "TJ's birthday!", p: 'blk', star: true, stamp: 'Happy birthday', items: [['2026-10-24T09:00+07:00', '9:00 AM: Wat Phra That Doi Suthep, the golden temple on the mountain'], ['2026-10-24T17:00+07:00', "5:00 PM: TJ's birthday dinner, 12 courses at Blackitch Artisan Kitchen"]] },
@@ -630,7 +629,7 @@ const DAYS = [
 const DAY_STK = {
   '2026-10-13': ['r2-01-jeep-driving-kona-rio', 'r2-13-covered-bridge'], '2026-10-14': ['r2-05-grammy-tims-house', 'r2-03-kona-rio'], '2026-10-15': ['06-passport', 'r2-03-kona-rio'],
   '2026-10-16': ['r2-08-plane-delta', 'r2-17-la-palms-sunset'], '2026-10-17': ['r2-09-plane-eva-air', 'r2-18-taipei-101'], '2026-10-18': ['05-thai-flag', '32-pool-villa-resort'],
-  '2026-10-19': ['32-pool-villa-resort', '08-coconut'], '2026-10-20': ['20-beach', '18-mango-sticky-rice'], '2026-10-21': ['42-palm-sunset', 'karst'],
+  '2026-10-19': ['32-pool-villa-resort', '08-coconut'], '2026-10-20': ['20-beach', '18-mango-sticky-rice'], '2026-10-21': ['r2-24-food-coma', '42-palm-sunset', 'karst'],
   '2026-10-22': ['r2-06-hotel-aleenta-chiang-mai', '43-night-market'], '2026-10-23': ['15-elephant'], '2026-10-24': ['r2-22-birthday-cake', 'chedi'],
   '2026-10-25': ['09-temple', '43-night-market'], '2026-10-26': ['r2-07-hotel-waldorf-astoria-bangkok', '29-street-food-cart'], '2026-10-27': ['r2-20-shopping', 'r2-21-rooftop'],
   '2026-10-28': ['r2-19-tattoo', '11-tuk-tuk'], '2026-10-29': ['r2-09-plane-eva-air', 'r2-17-la-palms-sunset'], '2026-10-30': ['r2-08-plane-delta', 'r2-03-kona-rio'],
@@ -1258,6 +1257,7 @@ class Component extends DCLogic {
     if (fun) Object.assign(tr, { head: fun.head, sub: fun.sub });
     tr.stamp = fun ? fun.stamp : ''; tr.hasStamp = !!tr.stamp;
     tr.story = fun ? fun.story : ''; tr.hasStory = !!tr.story;
+    Object.assign(tr, fun && fun.sticker ? { artW: 'clamp(108px,30vw,150px)', artH: 'clamp(84px,23vw,117px)', artM: '0 -4px 0 0' } : { artW: 'clamp(72px,20vw,104px)', artH: 'clamp(72px,20vw,104px)', artM: '6px 6px 0 0' });
     if (c.live) {
       const age = st.now - c.live.ts; const live = age < 3600000; tr.locLive = live; tr.locOld = !live; tr.locLine = (live ? 'TJ & Kyle · ' : 'Last check-in · ') + ago(age);
       if (st.fixWx) wx = st.fixWx;
@@ -1272,7 +1272,7 @@ class Component extends DCLogic {
     const artKey = c.k === 'flight' ? (c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
       : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
     const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
-    const nowSticker = fun ? null : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
+    const nowSticker = fun ? (fun.sticker ? React.createElement('img', { key: 'fun', src: S(fun.sticker), alt: '', style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'rotate(4deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } }) : null) : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
 
     const ti = this.todayIdx(t);
     const todayDay = ti >= 0 ? DAYS[ti] : null;
@@ -1331,7 +1331,7 @@ class Component extends DCLogic {
     const d0 = Date.parse(DAYS[0].d + 'T12:00:00Z'), pad0 = new Date(d0).getUTCDay();
     const cal = [];
     for (let k = 0; k < pad0; k++) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
-    days.forEach((d, i) => { const isT = i === ti, sel = st.dayIdx != null && i === dayI; cal.push({ empty: false, num: d.dd, label: d.wd + ' ' + d.mon + ' ' + d.dd, go: () => goDay(i, true), stk: d.stickers && d.stickers[0] ? d.stickers[0].src : '', stkOp: d.done && !isT ? .55 : 1, shadow: sel ? '0 4px 12px rgba(46,33,23,.25)' : 'none',
+    days.forEach((d, i) => { const isT = i === ti, sel = st.dayIdx != null && i === dayI; cal.push({ empty: false, num: d.dd, label: d.wd + ' ' + d.mon + ' ' + d.dd, go: () => goDay(i, true), stk: d.stickers && d.stickers[0] ? d.stickers[0].src : '', stkOp: d.done && !isT ? .55 : 1, ...(/food-coma/.test(d.stickers && d.stickers[0] ? d.stickers[0].src : '') ? { stkT: '4px', stkB: 'auto', stkW: 'min(50%,58px)', stkH: 'auto' } : { stkT: 'auto', stkB: '2px', stkW: 'clamp(20px,6vw,40px)', stkH: 'clamp(20px,6vw,40px)' }), shadow: sel ? '0 4px 12px rgba(46,33,23,.25)' : 'none',
       bg: isT ? '#5C3D24' : d.done ? '#E2CDA8' : '#FBF3E4', ink: isT ? '#FBF3E4' : d.done ? '#6B5643' : '#2E2117', ring: sel ? '#B5452F' : isT ? '#5C3D24' : '#E2CDA8',
       mark: isT ? 'Today' : d.done ? '✓' : d.star ? '★' : d.dd === '1' ? d.mon : '', markInk: isT ? '#E2BF6E' : '#7A4B26' }); });
     while (cal.length % 7) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
