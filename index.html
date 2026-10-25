@@ -583,6 +583,8 @@ const NOW_ART = {
   york: ['r2-05-grammy-tims-house', 'barn'], usm: ['32-pool-villa-resort', 'karst'], cnx: ['r2-06-hotel-aleenta-chiang-mai', 'chedi'], bkk: ['r2-07-hotel-waldorf-astoria-bangkok', 'curry'],
   drive: ['r2-01-jeep-driving-kona-rio', 'jeep'], home: ['r2-15-lighthouse', 'r2-15-lighthouse'],
 };
+// Day-specific Right Now art (overrides the hotel sticker while on the ground that day)
+const NOW_DAY_ART = { '2026-10-25': ['tattoo-tiger-kyle', 'tattoo-whaleshark-tj'] };
 const S = n => 'assets/stickers/' + n + '.png';
 const PH = n => 'assets/photos/' + n;
 const STICKERS = ['r2-09-plane-eva-air', '15-elephant', 'karst', 'r2-18-taipei-101', 'chedi', '05-thai-flag', 'r2-03-kona-rio', 'curry', 'r2-08-plane-delta', '32-pool-villa-resort', 'r2-17-la-palms-sunset', 'polaroid', 'r2-22-birthday-cake', 'r2-10-plane-bangkok-airways', 'barn', 'r2-15-lighthouse', 'jeep', 'moon'];
@@ -675,7 +677,7 @@ const DAY_STK = {
   '2026-10-16': ['r2-08-plane-delta', 'r2-17-la-palms-sunset'], '2026-10-17': ['r2-09-plane-eva-air', 'r2-18-taipei-101'], '2026-10-18': ['05-thai-flag', '32-pool-villa-resort'],
   '2026-10-19': ['32-pool-villa-resort', '08-coconut'], '2026-10-20': ['20-beach', '18-mango-sticky-rice'], '2026-10-21': ['r2-24-food-coma', '42-palm-sunset', 'karst'],
   '2026-10-22': ['r2-06-hotel-aleenta-chiang-mai', '43-night-market'], '2026-10-23': ['15-elephant'], '2026-10-24': ['r2-22-birthday-cake', 'chedi'],
-  '2026-10-25': ['r2-19-tattoo', '43-night-market'], '2026-10-26': ['r2-07-hotel-waldorf-astoria-bangkok', '29-street-food-cart'], '2026-10-27': ['r2-21-rooftop', '11-tuk-tuk'],
+  '2026-10-25': ['tattoo-tiger-kyle', 'tattoo-whaleshark-tj'], '2026-10-26': ['r2-07-hotel-waldorf-astoria-bangkok', '29-street-food-cart'], '2026-10-27': ['r2-21-rooftop', '11-tuk-tuk'],
   '2026-10-28': ['r2-20-shopping', '29-street-food-cart'], '2026-10-29': ['r2-09-plane-eva-air', 'r2-17-la-palms-sunset'], '2026-10-30': ['r2-08-plane-delta', 'r2-03-kona-rio'],
   '2026-10-31': ['r2-05-grammy-tims-house', 'barn'], '2026-11-01': ['r2-01-jeep-driving-kona-rio', 'r2-15-lighthouse'],
 };
@@ -1319,13 +1321,20 @@ class Component extends DCLogic {
 
     const artKey = c.k === 'flight' ? (/Thai Airways/.test(c.air) ? 'tg' : c.tbd || /Bangkok Airways/.test(c.air) ? 'pg' : /EVA/.test(c.air) ? 'eva' : 'delta')
       : c.k === 'drive' || c.k === 'homeday' ? 'drive' : c.k === 'before' || c.k === 'after' ? 'home' : (c.p || 'home');
-    const art = NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
-    const nowSticker = fun ? (fun.sticker ? React.createElement('img', { key: 'fun', src: S(fun.sticker), alt: '', style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'rotate(4deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } }) : null) : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
+    const artDay = DAYS[this.todayIdx(t)];
+    const dayArt = artDay && !['before', 'after', 'homeday', 'drive', 'flight', 'airport'].includes(c.k) ? NOW_DAY_ART[artDay.d] : null;
+    const art = dayArt || NOW_ART[artKey] || ['r2-15-lighthouse', 'r2-15-lighthouse'];
+    if (dayArt && !fun) Object.assign(tr, { artW: 'clamp(112px,31vw,156px)', artH: 'clamp(100px,28vw,140px)', artM: '0 -4px 0 0' });
+    const pairImg = (n, st) => React.createElement('img', { key: n, src: S(n), alt: '', style: Object.assign({ position: 'absolute', objectFit: 'contain', display: 'block', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' }, st) });
+    const nowSticker = dayArt && !fun ? React.createElement(React.Fragment, null,
+      pairImg(dayArt[1], { left: '-4%', top: '4%', width: '44%', height: '92%', transform: 'rotate(-10deg)' }),
+      pairImg(dayArt[0], { right: '-2%', top: '0', width: '64%', height: '100%', transform: 'rotate(6deg)' }))
+      : fun ? (fun.sticker ? React.createElement('img', { key: 'fun', src: S(fun.sticker), alt: '', style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'rotate(4deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } }) : null) : React.createElement('img', { key: artKey, src: S(art[0]), alt: '', onError: e => { const f = S(art[1]); if (!e.currentTarget.src.endsWith(f)) e.currentTarget.src = f; }, style: { width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: (c.k === 'flight' && isWest(P[c.from].ll, P[c.to].ll) ? 'scaleX(-1) ' : '') + 'rotate(5deg)', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,.18))' } });
 
     const ti = this.todayIdx(t);
     const todayDay = ti >= 0 ? DAYS[ti] : null;
     const NX_POS = [{ l: '-34%', t: '62%', w: '50%', r: '-10deg' }, { l: '70%', t: '-16%', w: '42%', r: '12deg' }, { l: '76%', t: '74%', w: '38%', r: '-6deg' }];
-    const nowExtras = fun ? [] : [...new Set((todayDay ? DAY_STK[todayDay.d] || [] : []).concat([art[1]]))].filter(n => n && n !== art[0]).slice(0, 3).map((n, i) => Object.assign({ src: S(n) }, NX_POS[i]));
+    const nowExtras = fun || dayArt ? [] : [...new Set((todayDay ? DAY_STK[todayDay.d] || [] : []).concat([art[1]]))].filter(n => n && n !== art[0]).slice(0, 3).map((n, i) => Object.assign({ src: S(n) }, NX_POS[i]));
     let today = { title: '', items: [], count: '', label: 'On the agenda today', struck: [], hasStruck: false, signoff: '', hasSignoff: false };
     if (todayDay) {
       const ds = this.dayStatus(todayDay, t);
@@ -1379,7 +1388,7 @@ class Component extends DCLogic {
     const d0 = Date.parse(DAYS[0].d + 'T12:00:00Z'), pad0 = new Date(d0).getUTCDay();
     const cal = [];
     for (let k = 0; k < pad0; k++) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
-    days.forEach((d, i) => { const isT = i === ti, sel = st.dayIdx != null && i === dayI; cal.push({ empty: false, num: d.dd, label: d.wd + ' ' + d.mon + ' ' + d.dd, go: () => goDay(i, true), stk: d.stickers && d.stickers[0] ? d.stickers[0].src : '', stkOp: d.done && !isT ? .55 : 1, ...(/food-coma/.test(d.stickers && d.stickers[0] ? d.stickers[0].src : '') ? { stkT: '4px', stkB: 'auto', stkW: 'min(50%,58px)', stkH: 'auto' } : { stkT: 'auto', stkB: '2px', stkW: 'clamp(20px,6vw,40px)', stkH: 'clamp(20px,6vw,40px)' }), shadow: sel ? '0 4px 12px rgba(46,33,23,.25)' : 'none',
+    days.forEach((d, i) => { const isT = i === ti, sel = st.dayIdx != null && i === dayI; cal.push({ empty: false, num: d.dd, label: d.wd + ' ' + d.mon + ' ' + d.dd, go: () => goDay(i, true), stk: d.stickers && d.stickers[0] ? d.stickers[0].src : '', stkOp: d.done && !isT ? .55 : 1, ...(/food-coma/.test(d.stickers && d.stickers[0] ? d.stickers[0].src : '') ? { stkT: '4px', stkB: 'auto', stkW: 'min(50%,58px)', stkH: 'auto' } : /tattoo-tiger/.test(d.stickers && d.stickers[0] ? d.stickers[0].src : '') ? { stkT: 'auto', stkB: '4px', stkW: 'clamp(18px,5vw,34px)', stkH: 'clamp(30px,9vw,54px)' } : { stkT: 'auto', stkB: '2px', stkW: 'clamp(20px,6vw,40px)', stkH: 'clamp(20px,6vw,40px)' }), shadow: sel ? '0 4px 12px rgba(46,33,23,.25)' : 'none',
       bg: isT ? '#5C3D24' : d.done ? '#E2CDA8' : '#FBF3E4', ink: isT ? '#FBF3E4' : d.done ? '#6B5643' : '#2E2117', ring: sel ? '#B5452F' : isT ? '#5C3D24' : '#E2CDA8',
       mark: isT ? 'Today' : d.done ? '✓' : d.star ? '★' : d.dd === '1' ? d.mon : '', markInk: isT ? '#E2BF6E' : '#7A4B26' }); });
     while (cal.length % 7) cal.push({ empty: true, num: '', mark: '', bg: 'transparent', ink: '#2E2117', ring: 'transparent', markInk: '#7A4B26', label: '', go: () => {}, stk: '', stkOp: 1, shadow: 'none' });
