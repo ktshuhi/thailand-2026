@@ -772,6 +772,8 @@ function destPt([la, lo], brgDeg, dKm) { const R = 6371, d = dKm / R, b = brgDeg
 function isWest(a, b) { const n = gc(a, b, 0.02); let d = n[1] - a[1]; if (d > 180) d -= 360; if (d < -180) d += 360; return d < 0; }
 const planeKey = air => /Thai Airways/.test(air || '') ? 'r2-25-plane-thai-airways' : /Bangkok Airways/.test(air || '') ? 'r2-10-plane-bangkok-airways' : /EVA/.test(air || '') ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
 const DAY_WEST = { '2026-10-16': true, '2026-10-17': true };
+// Privacy: anywhere within ~25 km of Yorkville is shown as Yorkville in general (town center), never the exact spot.
+const blurYork = fx => fx && fx.lat != null && km([fx.lat, fx.lon], [41.6411, -88.4473]) < 25 ? { ...fx, lat: 41.6411, lon: -88.4473, acc: null, area: 'Yorkville, IL' } : fx;
 function km(p, q) { const a = Math.sin((q[0] - p[0]) * D / 2) ** 2 + Math.cos(p[0] * D) * Math.cos(q[0] * D) * Math.sin((q[1] - p[1]) * D / 2) ** 2; return 12742 * Math.asin(Math.sqrt(a)); }
 function along(pts, f) {
   const L = []; let tot = 0;
@@ -831,7 +833,7 @@ const ADMIN = (() => { try {  const v = localStorage.getItem('kt_admin'); return
 const inTHll = ll => ll[1] > 97 && ll[1] < 106 && ll[0] > 5 && ll[0] < 21;
 
 class Component extends DCLogic {
-  state = { role: null, admin: ADMIN, album: ls.get('kt_album', []), up: null, who: ls.get('kt_who', ''), phase: 'checking', pass: '', err: '', now: Date.now(), si: 0, wx: {}, fix: ls.get('kt_fix', null), fixArea: '', fixWx: null, sel: null, view: null, checked: ls.get('kt_bucket', {}), fdOpen: false, famOk: ls.get('kt_fam2', false) === true, famPass: '', famErr: '', famErrN: 0, copied: null, lb: null, share: null, lastSent: null, shareErr: '', wake: false, adsb: null, status: null };
+  state = { role: null, admin: ADMIN, album: ls.get('kt_album', []), up: null, who: ls.get('kt_who', ''), phase: 'checking', pass: '', err: '', now: Date.now(), si: 0, wx: {}, fix: blurYork(ls.get('kt_fix', null)), fixArea: '', fixWx: null, sel: null, view: null, checked: ls.get('kt_bucket', {}), fdOpen: false, famOk: ls.get('kt_fam2', false) === true, famPass: '', famErr: '', famErrN: 0, copied: null, lb: null, share: null, lastSent: null, shareErr: '', wake: false, adsb: null, status: null };
 
   async componentDidMount() {
     this._spy = () => { if (this._spyR) return; this._spyR = requestAnimationFrame(() => { this._spyR = 0; let on = 'now'; for (const id of NAV_IDS) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < 150) on = id; } const b = document.body, sc = b.scrollHeight > b.clientHeight + 1 && getComputedStyle(b).overflowY !== 'visible' ? b : (document.scrollingElement || document.documentElement); if (sc.scrollTop > 0 && sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4) { const fe = document.getElementById('family'); on = fe && fe.getBoundingClientRect().top < window.innerHeight * 0.85 ? 'family' : 'photos'; } if (on !== this.state.navOn) this.setState({ navOn: on }); }); };
@@ -1002,14 +1004,16 @@ class Component extends DCLogic {
     } catch (e) {}
   }
   setFix(fx) {
+    fx = blurYork(fx);
     const old = this.state.fix;
     if (old && old.ts >= fx.ts && this.state.fixArea) return;
     ls.set('kt_fix', fx);
     this.setState({ fix: fx });
-    if (!old || km([old.lat, old.lon], [fx.lat, fx.lon]) > 0.5 || !this.state.fixArea) this.lookup(fx);
+    if (!old || km([old.lat, old.lon], [fx.lat, fx.lon]) > 0.5 || !this.state.fixArea || fx.area !== old.area) this.lookup(fx);
   }
   async lookup(fx) {
-    try {
+    if (fx.area) this.setState({ fixArea: fx.area });
+    else try {
       const r = await (await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&accept-language=en&lat=' + fx.lat + '&lon=' + fx.lon)).json();
       const a = r.address || {};
       this.setState({ fixArea: [a.suburb || a.neighbourhood || a.quarter || a.village || a.town, a.city || a.county || a.state].filter(Boolean).filter((v, i, x) => x.indexOf(v) === i).join(', ') });
@@ -1034,7 +1038,7 @@ class Component extends DCLogic {
   }
   stopWatch() { if (this.watch != null && navigator.geolocation) navigator.geolocation.clearWatch(this.watch); this.watch = null; }
   async onPos(p, force) {
-    const fx = { lat: +p.coords.latitude.toFixed(5), lon: +p.coords.longitude.toFixed(5), acc: Math.round(p.coords.accuracy), ts: Date.now(), who: this.state.share };
+    const fx = blurYork({ lat: +p.coords.latitude.toFixed(5), lon: +p.coords.longitude.toFixed(5), acc: Math.round(p.coords.accuracy), ts: Date.now(), who: this.state.share });
     const last = this.lastPub;
     if (!force && last && Date.now() - last.ts < 120000 && km([last.lat, last.lon], [fx.lat, fx.lon]) < 0.15) return;
     this.lastPub = fx;
