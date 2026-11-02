@@ -334,8 +334,8 @@ nav::-webkit-scrollbar{display:none}
     </section>
 
     <section id="stays" data-screen-label="Hotels" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
-      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">Where we're staying</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(calc((100% - 24px) / 3), (880px - 100%) * 999, 100%),1fr));gap:12px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;background:#5C3D24;color:#F7EEDF;padding:4px 14px;border-radius:14px;box-shadow:0 2px 0 rgba(46,33,23,.25);width:max-content;max-width:100%">{{ staysTitle }}</h2>
+      <div style="display:grid;grid-template-columns:{{ staysCols }};gap:12px">
         <sc-for list="{{ stays }}" as="st" hint-placeholder-count="4">
           <div style="background:radial-gradient(rgba(92,61,36,.08) 1px, transparent 1.4px) 0 0/7px 7px, radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.4px) 3px 4px/9px 9px, linear-gradient(160deg, #EFE2CC, #E6D3B4);border-radius:24px;overflow:hidden;box-shadow:0 0 0 2px #CDB28A,0 12px 30px rgba(46,33,23,.12);display:flex;flex-direction:column;border:3px solid {{ st.border }}">
             <div style="position:relative">
@@ -366,7 +366,7 @@ nav::-webkit-scrollbar{display:none}
           <sc-for list="{{ grammy.facts }}" as="f" hint-placeholder-count="1"><div style="font-size:14px;color:#5E6770">{{ f }}</div></sc-for>
         </div>
       </div></sc-if>
-      <button onClick="{{ toggleStays }}" style="align-self:center;min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">{{ staysLabel }}</button>
+      <sc-if value="{{ showStaysToggle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleStays }}" style="align-self:center;min-height:44px;border:0;border-radius:999px;padding:0 18px;background:#5C3D24;color:#FFFFFF;font:700 14px Figtree,sans-serif;cursor:pointer">{{ staysLabel }}</button></sc-if>
     </section>
 
     <section id="flights" data-screen-label="Flights" style="scroll-margin-top:140px;display:flex;flex-direction:column;gap:12px">
@@ -1406,12 +1406,13 @@ class Component extends DCLogic {
 
     const showRet = t >= RETURN_T;
     const flSegs = SEGS.filter(sg => sg.k === 'flight');
-    const flights = flSegs.filter(sg => t < sg.e).map(sg => {
-      const a = P[sg.from], b = P[sg.to], flying = t >= sg.s && t < sg.e, soon = !flying && !sg.tbd && sg.s - t < 3 * 3600000;
+    const tripOver = t >= T1;
+    const flights = flSegs.filter(sg => tripOver || t < sg.e).map(sg => {
+      const a = P[sg.from], b = P[sg.to], landed = t >= sg.e, flying = t >= sg.s && t < sg.e, soon = !flying && !sg.tbd && sg.s - t < 3 * 3600000;
       const pk = /Thai Airways/.test(sg.air) ? 'r2-25-plane-thai-airways' : sg.tbd || /Bangkok Airways/.test(sg.air) ? 'r2-10-plane-bangkok-airways' : /EVA/.test(sg.air) ? 'r2-09-plane-eva-air' : 'r2-08-plane-delta';
       return { sticker: S(pk), flip: isWest(a.ll, b.ll) ? 'scaleX(-1)' : 'none', route: a.city + ' → ' + b.city, title: sg.tbd ? 'Details coming soon' : sg.air + ' ' + sg.num.split(' ')[1], when: sg.tbd ? 'Mon, Oct 26' : dy(sg.s, a.tz) + ' · ' + tm(sg.s, a.tz),
         flying, pct: flying ? Math.round((t - sg.s) / (sg.e - sg.s) * 100) : 0,
-        status: flying ? 'In the air' : soon ? 'Soon' : sg.tbd ? 'TBD' : 'Track ↗', statusBg: flying ? 'oklch(0.58 0.11 225)' : soon ? 'oklch(0.9 0.08 75)' : '#F4E9D6', statusInk: flying ? '#fff' : '#1F2A33',
+        status: landed ? '✓ Completed' : flying ? 'In the air' : soon ? 'Soon' : sg.tbd ? 'TBD' : 'Track ↗', statusBg: landed ? GO : flying ? 'oklch(0.58 0.11 225)' : soon ? 'oklch(0.9 0.08 75)' : '#F4E9D6', statusInk: landed || flying ? '#fff' : '#1F2A33',
         border: flying ? 'oklch(0.58 0.11 225)' : 'transparent', fa: sg.cs ? 'https://www.flightaware.com/live/flight/' + sg.cs : '#flights' };
     });
 
@@ -1424,7 +1425,9 @@ class Component extends DCLogic {
         copy: () => { const txt = p.name + ', ' + p.address; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).catch(() => {}); this.setState({ copied: k }); setTimeout(() => this.setState({ copied: null }), 2000); } };
     };
     const nextStay = c.k === 'stay' ? c.p : (SEGS.find(sg => sg.k === 'stay' && sg.e > t) || {}).p;
-    const allStays = !!st.allStays, stays = ['usm', 'cnx', 'bkk'].map(mkStay).filter(x => allStays || x.key === nextStay), grammy = mkStay('york'), showGrammy = allStays || nextStay === 'york';
+    const allStays = !!st.allStays, stays = tripOver ? ['york', 'usm', 'cnx', 'bkk'].map(mkStay) : ['usm', 'cnx', 'bkk'].map(mkStay).filter(x => allStays || x.key === nextStay), grammy = mkStay('york'), showGrammy = !tripOver && (allStays || nextStay === 'york');
+    if (tripOver) stays.forEach(x => { if (x.key === 'york') { x.name = "Grammy & Tim's"; x.blurb = 'Where the trip started and ended. Kona & Rio stayed here with Grammy & Tim the whole time we were in Thailand.'; x.facts = ['Yorkville, Illinois', 'Before and after Thailand']; } });
+    const staysCols = tripOver ? 'repeat(auto-fit,minmax(clamp(calc((100% - 12px) / 2), (720px - 100%) * 999, 100%),1fr))' : 'repeat(auto-fit,minmax(clamp(calc((100% - 24px) / 3), (880px - 100%) * 999, 100%),1fr))';
 
     let done = 0, total = 0;
     const bucket = BUCKET.map(g => ({ title: g.title, items: g.items.map(([id, name, where, stk]) => {
@@ -1476,11 +1479,11 @@ class Component extends DCLogic {
       findUs: () => { if (!this.map) return; this.map.flyTo(mll(c.pos), c.k === 'flight' ? 4 : c.live ? 14 : 11, { duration: 1 }); this.setState({ view: null, sel: null }); },
       locLabel, dayMapRef: this.dayMapRef, skyRef: this.skyRef, showReturn: showRet, page, isAdmin: !!st.admin, families, dc, dots, cal, miles, nav: Object.fromEntries(NAV_IDS.map(id => [id, { bg: (st.navOn || 'now') === id ? '#5C3D24' : 'transparent', ink: (st.navOn || 'now') === id ? '#F7EEDF' : '#5C3D24', go: () => this.setState({ navOn: id }) }])), calMonth: st.dayIdx != null && DAYS[dayI].d.slice(5, 7) === '11' ? 'November 2026' : 'October 2026', dayShown: st.dayIdx != null, dayClose: () => this.setState({ dayIdx: null }), dayCardRef: this.dayCardRef, calOpen: !!st.calOpen, openCal: () => this.setState({ calOpen: true }), closeCal: () => this.setState({ calOpen: false }), stop: e => e.stopPropagation(), dayPrev: () => goDay(dayI - 1), dayNext: () => goDay(dayI + 1), dayToday: () => this.setState({ dayIdx: null }), notOnToday: ti >= 0 && dayI !== ti,
       dayTS: e => { this._tx = e.touches[0].clientX; }, dayTE: e => { const dx = e.changedTouches[0].clientX - (this._tx || 0); if (Math.abs(dx) > 50) goDay(dayI + (dx < 0 ? 1 : -1)); },
-      sel, days, hasToday: ti >= 0, tripPct, tripLabel, flights, flightsDone: flights.length ? flights.length + ' to go' : 'All done!',
-      flTop: (() => { const top = []; const f = flights.findIndex(x => x.flying); if (f >= 0) top.push(Object.assign({}, flights[f], { tag: 'Right now' })); const n = flights.findIndex((x, k) => !x.flying && k > f); if (n >= 0) top.push(Object.assign({}, flights[n], { tag: 'Up next' })); return top; })(),
+      sel, days, hasToday: ti >= 0, tripPct, tripLabel, flights, flightsDone: tripOver ? '✓ All ' + flights.length + ' flights completed' : flights.length ? flights.length + ' to go' : 'All done!',
+      flTop: tripOver ? flights : (() => { const top = []; const f = flights.findIndex(x => x.flying); if (f >= 0) top.push(Object.assign({}, flights[f], { tag: 'Right now' })); const n = flights.findIndex((x, k) => !x.flying && k > f); if (n >= 0) top.push(Object.assign({}, flights[n], { tag: 'Up next' })); return top; })(),
       flRest: (() => { const f = flights.findIndex(x => x.flying); const n = flights.findIndex((x, k) => !x.flying && k > f); return flights.filter((x, k) => k !== f && k !== n).map(x => Object.assign({}, x, { tag: '' })); })(),
-      hasRest: flights.length > 2 || (flights.length === 2 && !flights.some(x => x.flying)), showRest: !!st.showFl, toggleFl: () => this.setState(z => ({ showFl: !z.showFl })),
-      restLabel: st.showFl ? 'Hide other flights' : 'Show the other flights', stays, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
+      hasRest: !tripOver && (flights.length > 2 || (flights.length === 2 && !flights.some(x => x.flying))), showRest: !!st.showFl, toggleFl: () => this.setState(z => ({ showFl: !z.showFl })),
+      restLabel: st.showFl ? 'Hide other flights' : 'Show the other flights', stays, staysTitle: tripOver ? 'Where we stayed' : "Where we're staying", staysCols, showStaysToggle: !tripOver, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
       lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap, hasCap: photos[lbi].hasCap, loc: photos[lbi].loc, date: photos[lbi].date } : { src: '', cap: '', hasCap: false, loc: '', date: '' },
       hasPhotos: photos.length > 0, noPhotos: photos.length === 0, fileRef: this.fileRef, addPhotos: this.addPhotos, onFiles: this.onFiles, upOpen: !!upS, up: upV, upGo: this.upGo, closeUp: () => this.setState({ up: null }), whoKyle: setWho('kyle'), whoTJ: setWho('tj'),
       setKeyDraft: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { keyDraft: v }) })); },
