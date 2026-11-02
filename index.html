@@ -1189,7 +1189,7 @@ class Component extends DCLogic {
       } else { c.pos = along(drivePts(sg), f); c.tz = f < .5 ? P[sg.from].tz : P[sg.to].tz; }
     }
     const f = this.state.fix;
-    const lf = URL_NOW == null && f && t - f.ts < 6 * 3600000 && c.k !== 'flight' ? f : null;
+    const lf = URL_NOW == null && f && t - f.ts < 6 * 3600000 && c.k !== 'flight' && c.k !== 'after' ? f : null;
     if (lf) { c.live = lf; c.pos = [lf.lat, lf.lon]; if (inTHll(c.pos)) c.tz = BKK; }
     c.inTH = inTHll(c.pos);
     c.place = c.p || (c.k === 'flight' || c.k === 'drive' ? c.to : 'home');
@@ -1483,7 +1483,7 @@ class Component extends DCLogic {
       flTop: tripOver ? flights.slice(-1).map(x => Object.assign({}, x, { tag: 'Most recent' })) : (() => { const top = []; const f = flights.findIndex(x => x.flying); if (f >= 0) top.push(Object.assign({}, flights[f], { tag: 'Right now' })); const n = flights.findIndex((x, k) => !x.flying && k > f); if (n >= 0) top.push(Object.assign({}, flights[n], { tag: 'Up next' })); return top; })(),
       flRest: tripOver ? flights.slice(0, -1).map(x => Object.assign({}, x, { tag: '' })) : (() => { const f = flights.findIndex(x => x.flying); const n = flights.findIndex((x, k) => !x.flying && k > f); return flights.filter((x, k) => k !== f && k !== n).map(x => Object.assign({}, x, { tag: '' })); })(),
       hasRest: tripOver ? flights.length > 1 : (flights.length > 2 || (flights.length === 2 && !flights.some(x => x.flying))), showRest: !!st.showFl, toggleFl: () => this.setState(z => ({ showFl: !z.showFl })),
-      restLabel: st.showFl ? (tripOver ? 'Hide flights' : 'Hide other flights') : (tripOver ? 'See all ' + flights.length + ' flights' : 'Show the other flights'), stays, staysTitle: tripOver ? 'Where we stayed' : "Where we're staying", staysCols, showStaysToggle: !tripOver, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
+      restLabel: st.showFl ? (tripOver ? 'Hide flights' : 'Hide other flights') : (tripOver ? 'See all flights' : 'Show the other flights'), stays, staysTitle: tripOver ? 'Where we stayed' : "Where we're staying", staysCols, showStaysToggle: !tripOver, grammy, showGrammy, toggleStays: () => this.setState(z => ({ allStays: !z.allStays })), staysLabel: allStays ? 'Show less' : 'See all the places we\'re staying', bucket, bucketCount: done + ' of ' + total + ' done', photos,
       lbOpen: lbi != null && !!photos[lbi], lb: lbi != null && photos[lbi] ? { src: photos[lbi].src, cap: photos[lbi].cap, hasCap: photos[lbi].hasCap, loc: photos[lbi].loc, date: photos[lbi].date } : { src: '', cap: '', hasCap: false, loc: '', date: '' },
       hasPhotos: photos.length > 0, noPhotos: photos.length === 0, fileRef: this.fileRef, addPhotos: this.addPhotos, onFiles: this.onFiles, upOpen: !!upS, up: upV, upGo: this.upGo, closeUp: () => this.setState({ up: null }), whoKyle: setWho('kyle'), whoTJ: setWho('tj'),
       setKeyDraft: e => { const v = e.target.value; this.setState(z => ({ up: Object.assign({}, z.up, { keyDraft: v }) })); },
